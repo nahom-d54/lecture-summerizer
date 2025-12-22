@@ -21,7 +21,6 @@ RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy frontend source code
 COPY frontend/index.html ./frontend/
-COPY frontend/public ./frontend/public
 COPY frontend/src ./frontend/src
 
 # Build application
