@@ -1,30 +1,41 @@
 # Backend Dockerfile
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@9.15.3 --activate
 
 WORKDIR /app
 
+# Copy workspace root files needed for pnpm
+COPY ../pnpm-lock.yaml ../pnpm-workspace.yaml ../package.json ../
+
 # Copy package files
-COPY package*.json ./
-COPY tsconfig.json ./
-COPY tsconfig.json ./
+COPY package.json ./
 
 # Install dependencies
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
+COPY tsconfig.json ./
 COPY src ./src
 
 # Build TypeScript
-RUN npm run build
+RUN pnpm run build
 
 # Production stage
-FROM node:18-alpine
+FROM node:20-alpine
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@9.15.3 --activate
 
 WORKDIR /app
 
+# Copy workspace root files needed for pnpm
+COPY ../pnpm-lock.yaml ../pnpm-workspace.yaml ../package.json ../
+
 # Copy package files and install production dependencies only
-COPY package*.json ./
-RUN npm ci --only=production
+COPY package.json ./
+RUN pnpm install --prod --frozen-lockfile
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
