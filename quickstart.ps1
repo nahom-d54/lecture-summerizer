@@ -1,6 +1,6 @@
 # Quick Start Script for Windows PowerShell
 
-Write-Host "🚀 AI Mental Health Companion - Quick Start" -ForegroundColor Cyan
+Write-Host "🚀 Lecture Summarizer - Quick Start" -ForegroundColor Cyan
 Write-Host ""
 
 # Check Node.js

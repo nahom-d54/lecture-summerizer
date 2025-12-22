@@ -4,7 +4,7 @@ services:
   # Redis service
   redis:
     image: redis:7-alpine
-    container_name: mental-health-redis
+    container_name: lecture-summarizer-redis
     ports:
       - "6379:6379"
     volumes:
@@ -17,14 +17,14 @@ services:
       retries: 3
     restart: unless-stopped
     networks:
-      - mental-health-network
+      - lecture-summarizer-network
 
   # Backend service
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: mental-health-backend
+    container_name: lecture-summarizer-backend
     ports:
       - "5000:5000"
     environment:
@@ -42,14 +42,14 @@ services:
       - ./backend/logs:/app/logs
     restart: unless-stopped
     networks:
-      - mental-health-network
+      - lecture-summarizer-network
 
   # Frontend service
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: mental-health-frontend
+    container_name: lecture-summarizer-frontend
     ports:
       - "80:80"
     environment:
@@ -58,12 +58,12 @@ services:
       - backend
     restart: unless-stopped
     networks:
-      - mental-health-network
+      - lecture-summarizer-network
 
 volumes:
   redis-data:
     driver: local
 
 networks:
-  mental-health-network:
+  lecture-summarizer-network:
     driver: bridge

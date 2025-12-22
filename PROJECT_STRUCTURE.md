@@ -1,7 +1,7 @@
 # Project Structure Visualization
 
 ```
-AI-Mental-Health-Companion/
+Lecture-Summarizer/
 │
 ├── 📦 Root Configuration
 │   ├── package.json              ✅ Monorepo with workspaces

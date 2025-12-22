@@ -9,16 +9,16 @@ export const emailQueue = new Queue('email', {
     port: parseInt(process.env.REDIS_PORT || '6379'),
     password: process.env.REDIS_PASSWORD || undefined,
   },
-  prefix: process.env.BULL_QUEUE_PREFIX || 'mental-health',
+  prefix: process.env.BULL_QUEUE_PREFIX || 'lecture-summarizer',
 });
 
-export const aiProcessingQueue = new Queue('ai-processing', {
+export const aiProcessingQueue = new Queue('lecture-summarization', {
   redis: {
     host: process.env.REDIS_HOST || 'localhost',
     port: parseInt(process.env.REDIS_PORT || '6379'),
     password: process.env.REDIS_PASSWORD || undefined,
   },
-  prefix: process.env.BULL_QUEUE_PREFIX || 'mental-health',
+  prefix: process.env.BULL_QUEUE_PREFIX || 'lecture-summarizer',
 });
 
 // Queue event listeners
@@ -31,11 +31,11 @@ emailQueue.on('failed', (job, err) => {
 });
 
 aiProcessingQueue.on('completed', (job) => {
-  logger.info(`AI processing job ${job.id} completed`);
+  logger.info(`Lecture summarization job ${job.id} completed`);
 });
 
 aiProcessingQueue.on('failed', (job, err) => {
-  logger.error(`AI processing job ${job?.id} failed:`, err);
+  logger.error(`Lecture summarization job ${job?.id} failed:`, err);
 });
 
 // Graceful shutdown

@@ -1,4 +1,4 @@
-# AI Mental Health Companion - Setup Guide
+# Lecture Summarizer - Setup Guide
 
 ## Quick Start
 
@@ -56,7 +56,7 @@ npm run dev:frontend
 ## Project Structure
 
 ```
-ai-mental-health-companion/
+lecture-summarizer/
 ├── .github/
 │   └── workflows/          # GitHub Actions CI/CD
 │       ├── ci.yml          # Main CI pipeline

@@ -2,7 +2,7 @@
 
 ## ✅ What Has Been Created
 
-Your AI Mental Health Companion project is now fully configured with:
+Your Lecture Summarizer project is now fully configured with:
 
 ### 1. 🏗️ Monorepo Structure
 - Root workspace configuration with npm workspaces
@@ -288,6 +288,6 @@ const apiUrl = import.meta.env.VITE_API_URL;
 
 ## 🎊 You're All Set!
 
-Your project foundation is solid and production-ready. Start building your AI Mental Health Companion features with confidence!
+Your project foundation is solid and production-ready. Start building your Lecture Summarizer features with confidence!
 
 **Happy Coding! 🚀**

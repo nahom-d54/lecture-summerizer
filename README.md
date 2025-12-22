@@ -1,11 +1,11 @@
-# AI Mental Health Companion
+# Lecture Summarizer
 
-A comprehensive AI-powered mental health companion application built with a modern monorepo architecture.
+A comprehensive AI-powered lecture summarizer application built with a modern monorepo architecture.
 
 ## Project Structure
 
 ```
-ai-mental-health-companion/
+lecture-summarizer/
 ├── frontend/          # React + TypeScript + Vite
 ├── backend/           # Node.js + Express + TypeScript
 ├── docker-compose.yml # Container orchestration

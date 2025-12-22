@@ -15,7 +15,7 @@ router.get('/stats', async (_req: Request, res: Response) => {
       success: true,
       queues: {
         email: emailCounts,
-        aiProcessing: aiCounts,
+        lectureSummarization: aiCounts,
       },
     });
   } catch (error) {

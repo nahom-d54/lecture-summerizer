@@ -4,20 +4,20 @@ services:
   # Redis service
   redis:
     image: redis:7-alpine
-    container_name: mental-health-redis-dev
+    container_name: lecture-summarizer-redis-dev
     ports:
       - "6379:6379"
     volumes:
       - redis-dev-data:/data
     networks:
-      - mental-health-dev-network
+      - lecture-summarizer-dev-network
 
   # Backend service (development mode)
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
-    container_name: mental-health-backend-dev
+    container_name: lecture-summarizer-backend-dev
     ports:
       - "5000:5000"
     environment:
@@ -35,14 +35,14 @@ services:
       - ./backend/logs:/app/logs
       - /app/node_modules
     networks:
-      - mental-health-dev-network
+      - lecture-summarizer-dev-network
 
   # Frontend service (development mode)
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
-    container_name: mental-health-frontend-dev
+    container_name: lecture-summarizer-frontend-dev
     ports:
       - "5173:5173"
     environment:
@@ -54,12 +54,12 @@ services:
       - ./frontend/public:/app/public
       - /app/node_modules
     networks:
-      - mental-health-dev-network
+      - lecture-summarizer-dev-network
 
 volumes:
   redis-dev-data:
     driver: local
 
 networks:
-  mental-health-dev-network:
+  lecture-summarizer-dev-network:
     driver: bridge

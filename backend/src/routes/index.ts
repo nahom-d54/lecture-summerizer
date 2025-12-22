@@ -6,7 +6,7 @@ const router = Router();
 // Example route
 router.get('/', (_req, res) => {
   res.json({
-    message: 'AI Mental Health Companion API',
+    message: 'Lecture Summarizer API',
     version: '1.0.0',
   });
 });

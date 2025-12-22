@@ -1,8 +1,8 @@
 {
-  "name": "ai-mental-health-companion",
+  "name": "lecture-summarizer",
   "version": "1.0.0",
   "private": true,
-  "description": "AI-powered mental health companion application",
+  "description": "AI-powered lecture summarizer application",
   "workspaces": [
     "frontend",
     "backend"
