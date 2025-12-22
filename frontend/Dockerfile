@@ -17,7 +17,7 @@ COPY frontend/tailwind.config.js ./frontend/
 COPY frontend/postcss.config.js ./frontend/
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy frontend source code
 COPY frontend/index.html ./frontend/

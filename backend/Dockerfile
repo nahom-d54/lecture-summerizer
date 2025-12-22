@@ -13,7 +13,7 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY backend/package.json ./backend/
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # Copy backend source code
 COPY backend/tsconfig.json ./backend/
@@ -38,7 +38,7 @@ COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 COPY backend/package.json ./backend/
 
 # Install production dependencies only
-RUN pnpm install --prod --frozen-lockfile
+RUN pnpm install --prod --frozen-lockfile --ignore-scripts
 
 # Copy built files from builder
 COPY --from=builder /app/backend/dist ./backend/dist
