@@ -1,17 +1,23 @@
 # Frontend Dockerfile
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
+
+# Install pnpm
+RUN corepack enable && corepack prepare pnpm@9.15.3 --activate
 
 WORKDIR /app
 
+# Copy workspace root files needed for pnpm
+COPY ../pnpm-lock.yaml ../pnpm-workspace.yaml ../package.json ../
+
 # Copy package files
-COPY package*.json ./
+COPY package.json ./
 COPY tsconfig*.json ./
 COPY vite.config.ts ./
 COPY tailwind.config.js ./
 COPY postcss.config.js ./
 
 # Install dependencies
-RUN npm ci
+RUN pnpm install --frozen-lockfile
 
 # Copy source code
 COPY index.html ./
@@ -19,7 +25,7 @@ COPY public ./public
 COPY src ./src
 
 # Build application
-RUN npm run build
+RUN pnpm run build
 
 # Production stage with nginx
 FROM nginx:alpine
