@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import queueRoutes from './queue.routes';
 
-const router = Router();
+const router: Router = Router();
 
 // Example route
 router.get('/', (_req, res) => {

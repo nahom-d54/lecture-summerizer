@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { aiProcessingQueue, emailQueue } from '@/queues';
 
-const router = Router();
+const router: Router = Router();
 
 // Get queue stats
 router.get('/stats', async (_req: Request, res: Response) => {
