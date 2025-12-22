@@ -15,14 +15,6 @@ module.exports = {
     '^@types/(.*)$': '<rootDir>/src/types/$1',
   },
   coverageDirectory: 'coverage',
-  collectCoverageFrom: [
-    'src/**/*.ts',
-    '!src/**/*.d.ts',
-    '!src/**/*.test.ts',
-    '!src/**/*.spec.ts',
-  ],
-  coveragePathIgnorePatterns: [
-    '/node_modules/',
-    '/dist/',
-  ],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/**/*.test.ts', '!src/**/*.spec.ts'],
+  coveragePathIgnorePatterns: ['/node_modules/', '/dist/'],
 };

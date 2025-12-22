@@ -1,5 +1,5 @@
-import { emailQueue } from './index';
 import { logger } from '@/config/logger';
+import { emailQueue } from './index';
 
 interface EmailJobData {
   to: string;
@@ -9,16 +9,16 @@ interface EmailJobData {
 }
 
 // Email processor
-emailQueue.process(async (job) => {
-  const { to, subject, body, html } = job.data as EmailJobData;
-  
+emailQueue.process(async job => {
+  const { to, subject } = job.data as EmailJobData;
+
   logger.info(`Processing email job ${job.id} to ${to}`);
-  
+
   try {
     // TODO: Implement actual email sending logic (e.g., using nodemailer)
     // For now, just simulate processing
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
+
     logger.info(`Email sent successfully to ${to}`);
     return { success: true, to, subject };
   } catch (error) {

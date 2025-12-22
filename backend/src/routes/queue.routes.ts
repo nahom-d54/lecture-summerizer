@@ -1,5 +1,5 @@
-import { Router, Request, Response } from 'express';
-import { emailQueue, aiProcessingQueue } from '@/queues';
+import { Request, Response, Router } from 'express';
+import { aiProcessingQueue, emailQueue } from '@/queues';
 
 const router = Router();
 
@@ -18,7 +18,7 @@ router.get('/stats', async (_req: Request, res: Response) => {
         lectureSummarization: aiCounts,
       },
     });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch queue stats',
