@@ -1,0 +1,26 @@
+name: Documentation
+about: Improvements or additions to documentation
+title: '[DOCS] '
+labels: documentation
+assignees: ''
+
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: Description of the documentation change
+      description: What needs to be updated or added?
+    validations:
+      required: true
+  - type: textarea
+    id: location
+    attributes:
+      label: Location
+      description: Which file(s) or section(s) need updating?
+    validations:
+      required: true
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Any other information or links to relevant discussions.
