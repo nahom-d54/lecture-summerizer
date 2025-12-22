@@ -7,19 +7,20 @@ RUN corepack enable && corepack prepare pnpm@9.15.3 --activate
 WORKDIR /app
 
 # Copy workspace root files needed for pnpm
-COPY ../pnpm-lock.yaml ../pnpm-workspace.yaml ../package.json ../
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 
-# Copy package files
-COPY package.json ./
+# Copy backend package files
+COPY backend/package.json ./backend/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
-COPY tsconfig.json ./
-COPY src ./src
+# Copy backend source code
+COPY backend/tsconfig.json ./backend/
+COPY backend/src ./backend/src
 
 # Build TypeScript
+WORKDIR /app/backend
 RUN pnpm run build
 
 # Production stage
@@ -31,16 +32,19 @@ RUN corepack enable && corepack prepare pnpm@9.15.3 --activate
 WORKDIR /app
 
 # Copy workspace root files needed for pnpm
-COPY ../pnpm-lock.yaml ../pnpm-workspace.yaml ../package.json ../
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 
-# Copy package files and install production dependencies only
-COPY package.json ./
+# Copy backend package files
+COPY backend/package.json ./backend/
+
+# Install production dependencies only
 RUN pnpm install --prod --frozen-lockfile
 
 # Copy built files from builder
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/backend/dist ./backend/dist
 
 # Create logs directory
+WORKDIR /app/backend
 RUN mkdir -p logs
 
 # Set environment

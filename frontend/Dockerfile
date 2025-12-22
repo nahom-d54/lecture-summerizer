@@ -7,34 +7,35 @@ RUN corepack enable && corepack prepare pnpm@9.15.3 --activate
 WORKDIR /app
 
 # Copy workspace root files needed for pnpm
-COPY ../pnpm-lock.yaml ../pnpm-workspace.yaml ../package.json ../
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json ./
 
-# Copy package files
-COPY package.json ./
-COPY tsconfig*.json ./
-COPY vite.config.ts ./
-COPY tailwind.config.js ./
-COPY postcss.config.js ./
+# Copy frontend package files
+COPY frontend/package.json ./frontend/
+COPY frontend/tsconfig*.json ./frontend/
+COPY frontend/vite.config.ts ./frontend/
+COPY frontend/tailwind.config.js ./frontend/
+COPY frontend/postcss.config.js ./frontend/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile
 
-# Copy source code
-COPY index.html ./
-COPY public ./public
-COPY src ./src
+# Copy frontend source code
+COPY frontend/index.html ./frontend/
+COPY frontend/public ./frontend/public
+COPY frontend/src ./frontend/src
 
 # Build application
+WORKDIR /app/frontend
 RUN pnpm run build
 
 # Production stage with nginx
 FROM nginx:alpine
 
 # Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Copy built files from builder
-COPY --from=builder /app/dist /usr/share/nginx/html
+COPY --from=builder /app/frontend/dist /usr/share/nginx/html
 
 # Expose port
 EXPOSE 80

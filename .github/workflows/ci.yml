@@ -138,7 +138,7 @@ jobs:
       - name: Build backend image
         uses: docker/build-push-action@v5
         with:
-          context: ./backend
+          context: .
           file: ./backend/Dockerfile
           push: false
           tags: lecture-summarizer-backend:${{ github.sha }}
@@ -148,7 +148,7 @@ jobs:
       - name: Build frontend image
         uses: docker/build-push-action@v5
         with:
-          context: ./frontend
+          context: .
           file: ./frontend/Dockerfile
           push: false
           tags: lecture-summarizer-frontend:${{ github.sha }}
