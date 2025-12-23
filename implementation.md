@@ -1,0 +1,249 @@
+# Implementation Plan
+
+- [x] 1. Set up project structure and core configuration
+  - [x] 1.1 Initialize monorepo with frontend (React/Vite) and backend (Node.js/Express) packages
+    - Create package.json files with dependencies
+    - Configure TypeScript for both packages
+    - Set up ESLint and Prettier
+    - _Requirements: All_
+  - [x] 1.2 Set up database schema and migrations
+    - Create PostgreSQL schema with users, recordings, transcripts, summaries, action_items tables
+    - Set up migration tooling (e.g., Knex or Prisma)
+    - Add full-text search index on transcripts
+    - _Requirements: 6.2, 6.5_
+  - [x] 1.3 Configure environment and secrets management
+    - Create .env.example with required variables (GEMINI_API_KEY, DATABASE_URL, etc.)
+    - Set up configuration module for Gemini API, database connection, file storage
+    - _Requirements: All_
+
+- [ ] 2. Implement file upload and validation
+  - [ ] 2.1 Create file validation utilities
+    - Implement format validation for MP3, WAV, M4A, WEBM
+    - Implement file size validation (500MB limit)
+    - _Requirements: 1.1, 1.2, 1.3_
+  - [ ] 2.2 Write property tests for file validation
+    - **Property 1: File format validation**
+    - **Property 2: File size validation**
+    - **Validates: Requirements 1.1, 1.2, 1.3**
+  - [ ] 2.3 Implement file storage service
+    - Create storage abstraction interface
+    - Implement local filesystem storage adapter
+    - Associate uploaded files with user accounts
+    - _Requirements: 1.5_
+  - [ ] 2.4 Write property test for file-user association
+    - **Property 3: File-user association**
+    - **Validates: Requirements 1.5**
+  - [ ] 2.5 Create upload API endpoint
+    - Implement POST /api/recordings endpoint
+    - Handle multipart file upload
+    - Return upload status and recording ID
+    - _Requirements: 1.1, 1.4, 1.5_
+
+- [ ] 3. Implement authentication system
+  - [ ] 3.1 Create password validation utility
+    - Implement validation for 8+ characters, mixed case, number requirement
+    - _Requirements: 7.1_
+  - [ ] 3.2 Write property test for password validation
+    - **Property 17: Password validation**
+    - **Validates: Requirements 7.1**
+  - [ ] 3.3 Implement user registration and login
+    - Create user model and repository
+    - Implement password hashing with bcrypt
+    - Generate JWT tokens on successful login
+    - _Requirements: 7.1, 7.2_
+  - [ ] 3.4 Write property tests for authentication
+    - **Property 18: Authentication success**
+    - **Property 19: Authentication failure security**
+    - **Validates: Requirements 7.2, 7.3**
+  - [ ] 3.5 Implement session management and token validation
+    - Create auth middleware for protected routes
+    - Implement token expiration handling
+    - _Requirements: 7.4_
+  - [ ] 3.6 Write property test for session expiration
+    - **Property 20: Session expiration**
+    - **Validates: Requirements 7.4**
+  - [ ] 3.7 Create authentication API endpoints
+    - POST /api/auth/register
+    - POST /api/auth/login
+    - POST /api/auth/logout
+    - POST /api/auth/password-reset
+    - _Requirements: 7.1, 7.2, 7.5_
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 5. Implement transcription service
+  - [ ] 5.1 Create transcription service with Google Gemini integration
+    - Implement Gemini API client using @google/generative-ai SDK
+    - Use Gemini's multimodal capabilities to process audio files
+    - Parse response into transcript segments with timestamps
+    - Handle confidence scores for segments
+    - _Requirements: 2.1, 2.3, 2.4_
+  - [ ] 5.2 Implement transcript storage and retrieval
+    - Create transcript repository
+    - Store segments as JSONB
+    - Associate transcripts with recordings
+    - _Requirements: 2.2_
+  - [ ] 5.3 Write property tests for transcript processing
+    - **Property 4: Transcript-recording association**
+    - **Property 5: Timestamp presence**
+    - **Property 6: Low confidence marking**
+    - **Validates: Requirements 2.2, 2.3, 2.4**
+
+- [ ] 6. Implement speaker diarization
+  - [ ] 6.1 Create diarization service with Gemini
+    - Use Gemini to analyze transcript and identify distinct speakers
+    - Assign consistent speaker labels (Speaker 1, Speaker 2, etc.)
+    - _Requirements: 3.1, 3.2_
+  - [ ] 6.2 Write property test for speaker label consistency
+    - **Property 7: Speaker label consistency**
+    - **Validates: Requirements 3.2**
+  - [ ] 6.3 Implement speaker name customization
+    - Add endpoint to update speaker names
+    - Replace generic labels with custom names in transcript and summary
+    - _Requirements: 3.4_
+  - [ ] 6.4 Write property test for speaker name replacement
+    - **Property 8: Speaker name replacement**
+    - **Validates: Requirements 3.4**
+
+- [ ] 7. Implement summarization service
+  - [ ] 7.1 Create summarization service with Gemini
+    - Use Gemini API for summary generation
+    - Design structured prompts for section headings and speaker attributions
+    - Enforce summary length constraint (20% of transcript) via prompt engineering
+    - _Requirements: 4.1, 4.2, 4.3, 4.4_
+  - [ ] 7.2 Write property test for summary length constraint
+    - **Property 9: Summary length constraint**
+    - **Validates: Requirements 4.2**
+  - [ ] 7.3 Implement speaker attribution in summaries
+    - Extract and store speaker attributions for key statements
+    - Validate speaker IDs exist in transcript
+    - _Requirements: 4.5_
+  - [ ] 7.4 Write property test for speaker attribution validity
+    - **Property 10: Speaker attribution validity**
+    - **Validates: Requirements 4.5**
+
+- [ ] 8. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 9. Implement action item extraction
+  - [ ] 9.1 Create action item extraction service with Gemini
+    - Use Gemini to identify tasks, assignees, and deadlines from transcript
+    - Return structured JSON with action item details
+    - Store action items with transcript references
+    - _Requirements: 5.1, 5.2, 5.5_
+  - [ ] 9.2 Write property tests for action item structure
+    - **Property 11: Action item structure**
+    - **Property 13: Transcript reference validity**
+    - **Validates: Requirements 5.2, 5.5**
+  - [ ] 9.3 Implement action item management
+    - Create endpoint to toggle completion status
+    - Create endpoint to update action item details
+    - _Requirements: 5.4_
+  - [ ] 9.4 Write property test for action item completion toggle
+    - **Property 12: Action item completion toggle**
+    - **Validates: Requirements 5.4**
+
+- [ ] 10. Implement processing pipeline orchestration
+  - [ ] 10.1 Set up Bull queue with Redis
+    - Configure job queue for async processing
+    - Implement job status tracking
+    - _Requirements: 1.4_
+  - [ ] 10.2 Create processing pipeline coordinator
+    - Orchestrate transcription → diarization → summarization → extraction flow
+    - Update recording status at each stage
+    - Handle failures and retries
+    - _Requirements: 1.4, 2.1_
+  - [ ] 10.3 Create processing status API endpoint
+    - GET /api/recordings/:id/status
+    - Return current processing stage and progress
+    - _Requirements: 1.4_
+
+- [ ] 11. Implement dashboard and recording management
+  - [ ] 11.1 Create recording repository and list endpoint
+    - Implement paginated listing with user filtering
+    - Include title, date, duration, status fields
+    - _Requirements: 6.1, 6.2_
+  - [ ] 11.2 Write property test for recording data completeness
+    - **Property 14: Recording data completeness**
+    - **Validates: Requirements 6.2**
+  - [ ] 11.3 Implement search functionality
+    - Add full-text search on transcripts
+    - Filter by title, date range, keywords
+    - _Requirements: 6.3_
+  - [ ] 11.4 Write property test for search result relevance
+    - **Property 15: Search result relevance**
+    - **Validates: Requirements 6.3**
+  - [ ] 11.5 Implement recording deletion with cascade
+    - Delete recording, transcript, summary, and action items
+    - Remove audio file from storage
+    - _Requirements: 6.5_
+  - [ ] 11.6 Write property test for cascade deletion
+    - **Property 16: Cascade deletion**
+    - **Validates: Requirements 6.5**
+
+- [ ] 12. Implement export service
+  - [ ] 12.1 Create export service with format generators
+    - Implement PDF generation (using pdfkit or similar)
+    - Implement TXT generation
+    - Implement DOCX generation (using docx library)
+    - _Requirements: 8.1_
+  - [ ] 12.2 Write property test for export format correctness
+    - **Property 21: Export format correctness**
+    - **Validates: Requirements 8.1**
+  - [ ] 12.3 Implement export content assembly
+    - Include recording title, date, summary, action items
+    - Format action items as checklist with assignee/deadline
+    - _Requirements: 8.2, 8.3_
+  - [ ] 12.4 Write property test for export content completeness
+    - **Property 22: Export content completeness**
+    - **Validates: Requirements 8.2, 8.3**
+  - [ ] 12.5 Create export API endpoint
+    - GET /api/recordings/:id/export?format=pdf|txt|docx
+    - Return file download
+    - _Requirements: 8.4_
+
+- [ ] 13. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 14. Build frontend components
+  - [ ] 14.1 Create authentication components
+    - LoginForm with email/password validation
+    - RegisterForm with password requirements display
+    - PasswordReset request form
+    - _Requirements: 7.1, 7.2, 7.5_
+  - [ ] 14.2 Create dashboard components
+    - RecordingList with pagination
+    - RecordingCard with status, title, date display
+    - SearchBar with filters
+    - _Requirements: 6.1, 6.2, 6.3_
+  - [ ] 14.3 Create upload components
+    - AudioUploader with drag-and-drop
+    - ProgressIndicator for upload and processing status
+    - Format and size validation feedback
+    - _Requirements: 1.1, 1.2, 1.3, 1.4_
+  - [ ] 14.4 Create viewer components
+    - TranscriptViewer with speaker labels and timestamps
+    - SummaryViewer with section headings
+    - ActionItemList with completion toggles
+    - ExportButton with format dropdown
+    - _Requirements: 2.5, 3.3, 4.4, 5.3, 5.4, 8.1_
+
+- [ ] 15. Wire up frontend with backend API
+  - [ ] 15.1 Create API client and authentication hooks
+    - Implement axios/fetch client with auth headers
+    - Create useAuth hook for login state
+    - Handle token refresh and expiration
+    - _Requirements: 7.2, 7.4_
+  - [ ] 15.2 Create recording and processing hooks
+    - useRecordings for list and search
+    - useUpload for file upload with progress
+    - useProcessingStatus for polling status
+    - _Requirements: 1.4, 6.1, 6.3_
+  - [ ] 15.3 Create viewer data hooks
+    - useTranscript, useSummary, useActionItems
+    - useExport for download handling
+    - _Requirements: 2.5, 4.4, 5.3, 8.4_
+
+- [ ] 16. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
