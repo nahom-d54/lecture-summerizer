@@ -16,24 +16,24 @@
     - Set up configuration module for Gemini API, database connection, file storage
     - _Requirements: All_
 
-- [ ] 2. Implement file upload and validation
-  - [ ] 2.1 Create file validation utilities
+- [x] 2. Implement file upload and validation
+  - [x] 2.1 Create file validation utilities
     - Implement format validation for MP3, WAV, M4A, WEBM
     - Implement file size validation (500MB limit)
     - _Requirements: 1.1, 1.2, 1.3_
-  - [ ] 2.2 Write property tests for file validation
+  - [x] 2.2 Write property tests for file validation
     - **Property 1: File format validation**
     - **Property 2: File size validation**
     - **Validates: Requirements 1.1, 1.2, 1.3**
-  - [ ] 2.3 Implement file storage service
+  - [x] 2.3 Implement file storage service
     - Create storage abstraction interface
     - Implement local filesystem storage adapter
     - Associate uploaded files with user accounts
     - _Requirements: 1.5_
-  - [ ] 2.4 Write property test for file-user association
+  - [x] 2.4 Write property test for file-user association
     - **Property 3: File-user association**
     - **Validates: Requirements 1.5**
-  - [ ] 2.5 Create upload API endpoint
+  - [x] 2.5 Create upload API endpoint
     - Implement POST /api/recordings endpoint
     - Handle multipart file upload
     - Return upload status and recording ID
