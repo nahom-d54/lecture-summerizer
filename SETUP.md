@@ -25,25 +25,15 @@ Edit the `.env` files with your actual values.
 
 ### 3. Start Development
 
-**Option A: Using Docker (Recommended)**
 
-```bash
-# Start all services with Docker Compose
-npm run docker:up
 
-# View logs
-docker-compose logs -f
-
-# Stop services
-npm run docker:down
-```
-
-**Option B: Local Development**
+### 3. Start Development
 
 ```bash
 # Start Redis (required)
-# On Windows with Docker Desktop:
-docker run -d -p 6379:6379 redis:7-alpine
+# Start Redis (Ensure Redis is installed and running)
+# Mac/Linux (with brew or apt):
+# redis-server
 
 # Start both frontend and backend
 npm run dev
@@ -130,9 +120,7 @@ npm run lint:fix         # Fix linting issues
 npm run format           # Format all code
 npm run format:check     # Check formatting
 npm run test             # Run all tests
-npm run docker:up        # Start Docker containers
-npm run docker:down      # Stop Docker containers
-npm run docker:build     # Build Docker images
+
 ```
 
 ### Backend
@@ -186,7 +174,6 @@ npm run test:ui          # Run tests with UI
 - **Linting**: ESLint + Prettier
 
 ### DevOps
-- **Containerization**: Docker + Docker Compose
 - **CI/CD**: GitHub Actions
 - **Security**: CodeQL + Dependency Review
 
@@ -259,33 +246,19 @@ export const addYourJob = async (data) => {
 };
 ```
 
-## Docker Usage
+## Deployment to Vercel
 
-### Production
-
-```bash
-# Build and start all services
-docker-compose up -d
-
-# View logs
-docker-compose logs -f backend
-docker-compose logs -f frontend
-
-# Stop services
-docker-compose down
-
-# Rebuild images
-docker-compose build --no-cache
-```
-
-### Development
+The easiest way to deploy is using the [Vercel CLI](https://vercel.com/docs/cli).
 
 ```bash
-# Use development compose file
-docker-compose -f docker-compose.dev.yml up -d
+# Install Vercel CLI
+npm i -g vercel
 
-# Hot reload is enabled for both services
+# Deploy
+vercel
 ```
+
+For the backend to work on Vercel, ensure you configure the environment variables for Redis (e.g., using Vercel KV or Upstash).
 
 ## Environment Variables
 
@@ -311,11 +284,8 @@ VITE_API_URL=http://localhost:5000
 ### Redis Connection Issues
 
 ```bash
-# Check if Redis is running
-docker ps | grep redis
-
 # Start Redis if not running
-docker run -d -p 6379:6379 redis:7-alpine
+redis-server
 
 # Test Redis connection
 redis-cli ping
@@ -342,15 +312,7 @@ npm run clean
 npm install
 ```
 
-### Docker Build Fails
 
-```bash
-# Clear Docker cache
-docker system prune -a
-
-# Rebuild without cache
-docker-compose build --no-cache
-```
 
 ## Testing
 

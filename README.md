@@ -8,7 +8,6 @@ A comprehensive AI-powered lecture summarizer application built with a modern mo
 lecture-summarizer/
 ├── frontend/          # React + TypeScript + Vite
 ├── backend/           # Node.js + Express + TypeScript
-├── docker-compose.yml # Container orchestration
 └── package.json       # Monorepo root
 ```
 
@@ -16,7 +15,6 @@ lecture-summarizer/
 
 - Node.js >= 18.0.0
 - npm >= 9.0.0
-- Docker & Docker Compose
 
 ## Getting Started
 
@@ -40,18 +38,7 @@ npm run dev:frontend
 npm run dev:backend
 ```
 
-### Docker
 
-```bash
-# Start all services (frontend, backend, Redis)
-npm run docker:up
-
-# Stop all services
-npm run docker:down
-
-# Build Docker images
-npm run docker:build
-```
 
 ### Code Quality
 
@@ -108,7 +95,6 @@ cp frontend/.env.example frontend/.env
 - PostgreSQL (ready to configure)
 
 ### DevOps
-- Docker & Docker Compose
 - GitHub Actions CI/CD
 - ESLint & Prettier
 

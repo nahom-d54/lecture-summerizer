@@ -8,26 +8,23 @@
     "backend"
   ],
   "scripts": {
-    "dev": "concurrently \"pnpm run dev --filter=backend\" \"pnpm run dev --filter=frontend\"",
-    "dev:backend": "pnpm run dev --filter=backend",
-    "dev:frontend": "pnpm run dev --filter=frontend",
-    "build": "pnpm run -r build",
-    "build:backend": "pnpm run build --filter=backend",
-    "build:frontend": "pnpm run build --filter=frontend",
+    "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "dev:backend": "npm run dev -w backend",
+    "dev:frontend": "npm run dev -w frontend",
+    "build": "npm run build --workspaces",
+    "build:backend": "npm run build -w backend",
+    "build:frontend": "npm run build -w frontend",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
     "format": "biome format --write .",
     "format:check": "biome format .",
-    "test": "pnpm run -r test",
-    "clean": "pnpm run -r clean && rm -rf node_modules",
-    "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down",
-    "docker:build": "docker-compose build",
+    "test": "npm run test --workspaces",
+    "clean": "npm run clean --workspaces && rm -rf node_modules",
     "prepare": "husky"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,md}": [
-      "pnpm run lint:fix"
+      "npm run lint:fix"
     ]
   },
   "devDependencies": {
