@@ -30,11 +30,6 @@ Edit the `.env` files with your actual values.
 ### 3. Start Development
 
 ```bash
-# Start Redis (required)
-# Start Redis (Ensure Redis is installed and running)
-# Mac/Linux (with brew or apt):
-# redis-server
-
 # Start both frontend and backend
 npm run dev
 
@@ -156,7 +151,7 @@ npm run test:ui          # Run tests with UI
 - **Runtime**: Node.js 18+
 - **Framework**: Express.js
 - **Language**: TypeScript
-- **Queue**: Bull + Redis
+
 - **Logging**: Winston
 - **Testing**: Jest
 - **Linting**: ESLint + Prettier
@@ -218,33 +213,7 @@ git push origin feature/your-feature-name
 3. Add tests in same directory
 4. Export from index file if needed
 
-## Queue System
 
-### Adding New Queue Processor
-
-1. Define queue in `backend/src/queues/index.ts`
-2. Create processor file (e.g., `backend/src/queues/yourProcessor.ts`)
-3. Implement processing logic
-4. Add helper function to enqueue jobs
-
-Example:
-
-```typescript
-// In queues/yourProcessor.ts
-import { yourQueue } from './index';
-
-yourQueue.process(async (job) => {
-  // Process job
-  return result;
-});
-
-export const addYourJob = async (data) => {
-  return await yourQueue.add(data, {
-    attempts: 3,
-    backoff: { type: 'exponential', delay: 2000 }
-  });
-};
-```
 
 ## Deployment to Vercel
 
@@ -281,15 +250,7 @@ VITE_API_URL=http://localhost:5000
 
 ## Troubleshooting
 
-### Redis Connection Issues
 
-```bash
-# Start Redis if not running
-redis-server
-
-# Test Redis connection
-redis-cli ping
-```
 
 ### Port Already in Use
 

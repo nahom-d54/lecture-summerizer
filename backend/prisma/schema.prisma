@@ -1,0 +1,81 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  passwordHash String      @map("password_hash")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @default(now()) @updatedAt @map("updated_at")
+  recordings   Recording[]
+
+  @@map("users")
+}
+
+model Recording {
+  id               String       @id @default(uuid())
+  userId           String       @map("user_id")
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title            String
+  originalFilename String       @map("original_filename")
+  fileSize         BigInt       @map("file_size")
+  duration         Int?
+  format           String
+  storagePath      String       @map("storage_path")
+  status           String       @default("uploading")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @default(now()) @updatedAt @map("updated_at")
+  transcript       Transcript?
+  summary          Summary?
+  actionItems      ActionItem[]
+
+  @@index([userId])
+  @@map("recordings")
+}
+
+model Transcript {
+  id          String    @id @default(uuid())
+  recordingId String    @unique @map("recording_id")
+  recording   Recording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  fullText    String    @map("full_text")
+  segments    Json
+  speakers    Json
+  duration    Int
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("transcripts")
+}
+
+model Summary {
+  id          String    @id @default(uuid())
+  recordingId String    @unique @map("recording_id")
+  recording   Recording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  content     String
+  sections    Json
+  keyPoints   Json      @map("key_points")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@map("summaries")
+}
+
+model ActionItem {
+  id               String    @id @default(uuid())
+  recordingId      String    @map("recording_id")
+  recording        Recording @relation(fields: [recordingId], references: [id], onDelete: Cascade)
+  description      String
+  assignee         String?
+  deadline         DateTime?
+  completed        Boolean   @default(false)
+  segmentStartTime Int?      @map("segment_start_time")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @default(now()) @updatedAt @map("updated_at")
+
+  @@map("action_items")
+}

@@ -1,29 +1,17 @@
 import { Request, Response, Router } from 'express';
-import { aiProcessingQueue, emailQueue } from '@/queues';
 
 const router: Router = Router();
 
 // Get queue stats
 router.get('/stats', async (_req: Request, res: Response) => {
-  try {
-    const [emailCounts, aiCounts] = await Promise.all([
-      emailQueue.getJobCounts(),
-      aiProcessingQueue.getJobCounts(),
-    ]);
-
-    res.json({
-      success: true,
-      queues: {
-        email: emailCounts,
-        lectureSummarization: aiCounts,
-      },
-    });
-  } catch (_error) {
-    res.status(500).json({
-      success: false,
-      error: 'Failed to fetch queue stats',
-    });
-  }
+  // Queues are disabled for this simplified version
+  res.json({
+    success: true,
+    queues: {
+      email: { active: 0, waiting: 0, completed: 0, failed: 0 },
+      lectureSummarization: { active: 0, waiting: 0, completed: 0, failed: 0 },
+    },
+  });
 });
 
 export default router;

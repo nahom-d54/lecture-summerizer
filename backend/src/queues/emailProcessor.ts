@@ -1,5 +1,4 @@
 import { logger } from '@/config/logger';
-import { emailQueue } from './index';
 
 interface EmailJobData {
   to: string;
@@ -8,11 +7,11 @@ interface EmailJobData {
   html?: string;
 }
 
-// Email processor
-emailQueue.process(async job => {
-  const { to, subject } = job.data as EmailJobData;
+// Helper function to send email (Directly processed, no queue)
+export const sendEmail = async (data: EmailJobData) => {
+  const { to, subject } = data;
 
-  logger.info(`Processing email job ${job.id} to ${to}`);
+  logger.info(`Processing email to ${to}`);
 
   try {
     // TODO: Implement actual email sending logic (e.g., using nodemailer)
@@ -25,15 +24,4 @@ emailQueue.process(async job => {
     logger.error(`Failed to send email to ${to}:`, error);
     throw error;
   }
-});
-
-// Helper function to add email to queue
-export const sendEmail = async (data: EmailJobData) => {
-  return await emailQueue.add(data, {
-    attempts: 3,
-    backoff: {
-      type: 'exponential',
-      delay: 2000,
-    },
-  });
 };
