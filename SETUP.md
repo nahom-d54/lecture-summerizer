@@ -22,6 +22,18 @@ cp frontend/.env.example frontend/.env
 ```
 
 Edit the `.env` files with your actual values.
+- For `backend/.env`, use the Neon Database URL provided by the team lead.
+
+### 2.1 Setup Database
+
+Update the database schema and generate the client:
+
+```bash
+cd backend
+npx prisma generate
+npx prisma db push
+cd ..
+```
 
 ### 3. Start Development
 
@@ -227,7 +239,7 @@ npm i -g vercel
 vercel
 ```
 
-For the backend to work on Vercel, ensure you configure the environment variables for Redis (e.g., using Vercel KV or Upstash).
+
 
 ## Environment Variables
 
@@ -236,10 +248,10 @@ For the backend to work on Vercel, ensure you configure the environment variable
 ```env
 NODE_ENV=development
 PORT=5000
-REDIS_HOST=localhost
-REDIS_PORT=6379
+DATABASE_URL="postgresql://user:password@host-url/dbname?sslmode=require"
 FRONTEND_URL=http://localhost:5173
 JWT_SECRET=your-secret-key
+GEMINI_API_KEY=your-gemini-key
 ```
 
 ### Frontend Required Variables
@@ -309,7 +321,7 @@ The project includes GitHub Actions workflows:
 
 - **CI Pipeline** (`.github/workflows/ci.yml`):
   - Linting and formatting checks
-  - Backend tests with Redis service
+  - Backend tests
   - Frontend tests
   - Docker image builds (on main branch)
 
