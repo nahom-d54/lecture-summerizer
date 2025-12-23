@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import queueRoutes from './queue.routes';
+import uploadRoutes from './upload.routes';
 
 const router: Router = Router();
 
@@ -13,5 +14,8 @@ router.get('/', (_req, res) => {
 
 // Queue management routes
 router.use('/queues', queueRoutes);
+
+// Upload/Recording routes
+router.use('/recordings', uploadRoutes);
 
 export default router;
