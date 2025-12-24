@@ -5,7 +5,7 @@
 ### 1. Install Dependencies
 
 ```bash
-# Install all workspace dependencies
+# Install all workspace dependencies and other details
 npm install
 ```
 
