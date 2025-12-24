@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import authRoutes from './auth.routes';
 import queueRoutes from './queue.routes';
 import uploadRoutes from './upload.routes';
 
@@ -11,6 +12,9 @@ router.get('/', (_req, res) => {
     version: '1.0.0',
   });
 });
+
+// Authentication routes
+router.use('/auth', authRoutes);
 
 // Queue management routes
 router.use('/queues', queueRoutes);
