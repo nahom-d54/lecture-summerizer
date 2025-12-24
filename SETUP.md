@@ -42,7 +42,7 @@ cd ..
 ### 3. Start Development
 
 ```bash
-# Start both frontend and backend
+# Start both the frontend and the backend
 npm run dev
 
 # Or start individually
