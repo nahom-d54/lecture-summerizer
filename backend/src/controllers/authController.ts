@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
+import validator from 'validator';
 import { logger } from '@/config/logger';
-import { AppError } from '@/middleware/errorHandler';
 import { userRepository } from '@/repositories/user.repository';
 import { passwordService } from '@/services/password.service';
 import { tokenService } from '@/services/token.service';
@@ -23,9 +23,8 @@ export const register = async (req: Request, res: Response) => {
       });
     }
 
-    // Validate email format (basic)
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
+    // Validate email format using validator library (ReDoS-safe)
+    if (!validator.isEmail(email)) {
       return res.status(400).json({
         success: false,
         error: 'Invalid email format',
