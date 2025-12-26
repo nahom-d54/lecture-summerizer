@@ -1,5 +1,5 @@
-import fs from 'fs/promises';
-import path from 'path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { gemini } from '@/config/gemini';
 import { logger } from '@/config/logger';
 import {
@@ -19,7 +19,10 @@ export class DiarizationService {
    * Perform speaker diarization on audio or text input
    * Identifies "Who spoke when" with timestamps
    */
-  async diarize(input: DiarizationInput, options: DiarizationOptions = {}): Promise<DiarizationResult> {
+  async diarize(
+    input: DiarizationInput,
+    options: DiarizationOptions = {}
+  ): Promise<DiarizationResult> {
     try {
       // Validate input
       this.validateInput(input);
@@ -272,7 +275,7 @@ Rules:
 
     return segments
       .filter(seg => seg !== null && typeof seg === 'object')
-      .map((seg: unknown, index: number) => {
+      .map((seg: unknown, _index: number) => {
         const segment = seg as Record<string, unknown>;
         return {
           startTime: Math.max(0, Number(segment.startTime) || 0),
@@ -329,7 +332,7 @@ Rules:
     const mappedSegments = result.segments.map(segment => {
       const normalizedSpeaker = this.normalizeSpeakerLabel(segment.speaker);
       const mappedName = normalizedMapping.get(normalizedSpeaker);
-      
+
       return {
         ...segment,
         speaker: mappedName || segment.speaker,
@@ -370,10 +373,12 @@ Rules:
   private validateTimestamps(segments: DiarizedSegment[]): void {
     for (let i = 0; i < segments.length; i++) {
       const segment = segments[i];
-      
+
       // Ensure startTime <= endTime
       if (segment.startTime > segment.endTime) {
-        logger.warn(`Segment ${i} has invalid timestamps: start (${segment.startTime}) > end (${segment.endTime})`);
+        logger.warn(
+          `Segment ${i} has invalid timestamps: start (${segment.startTime}) > end (${segment.endTime})`
+        );
         // Fix by swapping if needed
         [segment.startTime, segment.endTime] = [segment.endTime, segment.startTime];
       }
@@ -397,22 +402,34 @@ Rules:
    * Validate input parameters
    */
   private validateInput(input: DiarizationInput): void {
-    if (!input.audioPath && !input.text && (!input.existingSegments || input.existingSegments.length === 0)) {
+    if (
+      !input.audioPath &&
+      !input.text &&
+      (!input.existingSegments || input.existingSegments.length === 0)
+    ) {
       throw new Error('At least one of audioPath, text, or existingSegments must be provided');
     }
 
     if (input.existingSegments) {
-      // Validate existing segments structure
-      for (const seg of input.existingSegments) {
-        if (typeof seg.startTime !== 'number' || typeof seg.endTime !== 'number') {
-          throw new Error('Existing segments must have numeric startTime and endTime');
-        }
-        if (seg.startTime < 0 || seg.endTime < 0) {
-          throw new Error('Existing segments must have non-negative timestamps');
-        }
-        if (seg.startTime > seg.endTime) {
-          throw new Error('Existing segments must have startTime <= endTime');
-        }
+      this.validateExistingSegments(input.existingSegments);
+    }
+  }
+
+  /**
+   * Validate existing segments structure
+   */
+  private validateExistingSegments(
+    segments: Array<{ startTime: number; endTime: number; text: string }>
+  ): void {
+    for (const seg of segments) {
+      if (typeof seg.startTime !== 'number' || typeof seg.endTime !== 'number') {
+        throw new Error('Existing segments must have numeric startTime and endTime');
+      }
+      if (seg.startTime < 0 || seg.endTime < 0) {
+        throw new Error('Existing segments must have non-negative timestamps');
+      }
+      if (seg.startTime > seg.endTime) {
+        throw new Error('Existing segments must have startTime <= endTime');
       }
     }
   }
@@ -434,4 +451,3 @@ Rules:
 }
 
 export const diarizationService = new DiarizationService();
-

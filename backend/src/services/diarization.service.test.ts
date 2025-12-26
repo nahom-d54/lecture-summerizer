@@ -1,10 +1,5 @@
 import * as fc from 'fast-check';
-import {
-  DiarizationInput,
-  DiarizationOptions,
-  DiarizationResult,
-  DiarizedSegment,
-} from '@/types/diarization.types';
+import { DiarizationInput, DiarizationResult, DiarizedSegment } from '@/types/diarization.types';
 import { DiarizationService } from './diarization.service';
 
 // Mock dependencies
@@ -50,7 +45,7 @@ describe('DiarizationService Property Tests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     diarizationService = new DiarizationService();
-    
+
     const { gemini } = require('@/config/gemini');
     const mockModel = gemini.getGenerativeModel();
     mockGenerateContent = mockModel.generateContent as jest.Mock;
@@ -76,19 +71,17 @@ describe('DiarizationService Property Tests', () => {
           // Mock a response to prevent actual API call
           mockGenerateContent.mockResolvedValueOnce({
             response: {
-              text: () => JSON.stringify({
-                segments: [],
-                speakers: [],
-                duration: 0,
-              }),
+              text: () =>
+                JSON.stringify({
+                  segments: [],
+                  speakers: [],
+                  duration: 0,
+                }),
             },
           });
 
           try {
-            const result = await diarizationService.diarize(
-              { text: randomString },
-              {}
-            );
+            const result = await diarizationService.diarize({ text: randomString }, {});
             // Should return a valid result structure
             expect(result).toHaveProperty('segments');
             expect(result).toHaveProperty('speakers');
@@ -133,7 +126,7 @@ describe('DiarizationService Property Tests', () => {
 
       for (const input of malformedInputs) {
         const result = diarizationService.parseDiarizationResponse(input);
-        
+
         // Should always return a valid result structure
         expect(result).toHaveProperty('segments');
         expect(result).toHaveProperty('speakers');
@@ -150,10 +143,10 @@ describe('DiarizationService Property Tests', () => {
           // Filter out segments with empty text since they get filtered during parsing
           const validSegments = mockResult.segments.filter(s => s.text.trim().length > 0);
           if (validSegments.length === 0) return true; // Skip if no valid segments
-          
-          const wrappedJson = '```json\n' + JSON.stringify({ ...mockResult, segments: validSegments }) + '\n```';
+
+          const wrappedJson = `\`\`\`json\n${JSON.stringify({ ...mockResult, segments: validSegments })}\n\`\`\``;
           const parsed = diarizationService.parseDiarizationResponse(wrappedJson);
-          
+
           // Should parse correctly and have the same number of valid segments
           return parsed.segments.length === validSegments.length;
         })
@@ -162,7 +155,7 @@ describe('DiarizationService Property Tests', () => {
 
     test('Parsing handles whitespace-only input', () => {
       const whitespaceInputs = ['   ', '\n\n', '\t\t', '   \n   '];
-      
+
       for (const input of whitespaceInputs) {
         const result = diarizationService.parseDiarizationResponse(input);
         expect(result.segments).toEqual([]);
@@ -193,7 +186,7 @@ describe('DiarizationService Property Tests', () => {
             });
 
             const parsed = diarizationService.parseDiarizationResponse(jsonResponse);
-            
+
             if (parsed.segments.length > 0) {
               return (
                 typeof parsed.segments[0].startTime === 'number' &&
@@ -216,7 +209,7 @@ describe('DiarizationService Property Tests', () => {
           (segments, mapping) => {
             // Ensure at least one segment has a mappable speaker
             if (segments.length === 0) return true;
-            
+
             const result: DiarizationResult = {
               segments,
               speakers: [...new Set(segments.map(s => s.speaker))],
@@ -224,17 +217,17 @@ describe('DiarizationService Property Tests', () => {
             };
 
             const mapped = (diarizationService as any).applySpeakerMapping(result, mapping);
-            
+
             // All segments should still be present
             expect(mapped.segments.length).toBe(result.segments.length);
-            
+
             // If mapping is empty, result should be unchanged
             if (Object.keys(mapping).length === 0) {
-              return mapped.segments.every((seg: DiarizedSegment, i: number) => 
-                seg.speaker === result.segments[i].speaker
+              return mapped.segments.every(
+                (seg: DiarizedSegment, i: number) => seg.speaker === result.segments[i].speaker
               );
             }
-            
+
             return true;
           }
         )
@@ -259,11 +252,15 @@ describe('DiarizationService Property Tests', () => {
       const mapped = (diarizationService as any).applySpeakerMapping(result, mapping);
 
       // All variations of "Speaker 1" should be mapped to "Professor"
-      const professorSegments = mapped.segments.filter((s: DiarizedSegment) => s.speaker === 'Professor');
+      const professorSegments = mapped.segments.filter(
+        (s: DiarizedSegment) => s.speaker === 'Professor'
+      );
       expect(professorSegments.length).toBe(3); // All three variations
 
       // "Speaker 2" should be mapped to "Student"
-      const studentSegments = mapped.segments.filter((s: DiarizedSegment) => s.speaker === 'Student');
+      const studentSegments = mapped.segments.filter(
+        (s: DiarizedSegment) => s.speaker === 'Student'
+      );
       expect(studentSegments.length).toBe(1);
     });
 
@@ -341,7 +338,7 @@ describe('DiarizationService Property Tests', () => {
           segments => {
             // Shuffle segments
             const shuffled = [...segments].sort(() => Math.random() - 0.5);
-            
+
             const result: DiarizationResult = {
               segments: shuffled,
               speakers: [...new Set(shuffled.map(s => s.speaker))],
@@ -382,7 +379,7 @@ describe('DiarizationService Property Tests', () => {
           });
 
           const parsed = diarizationService.parseDiarizationResponse(jsonResponse);
-          
+
           if (parsed.segments.length > 0) {
             const confidence = parsed.segments[0].confidence;
             return confidence >= 0 && confidence <= 1;
@@ -398,14 +395,20 @@ describe('DiarizationService Property Tests', () => {
           { startTime: 0, endTime: 1, text: 'Valid text', speaker: 'Speaker 1', confidence: 0.9 },
           { startTime: 1, endTime: 2, text: '', speaker: 'Speaker 1', confidence: 0.9 },
           { startTime: 2, endTime: 3, text: '   ', speaker: 'Speaker 1', confidence: 0.9 },
-          { startTime: 3, endTime: 4, text: 'Another valid', speaker: 'Speaker 1', confidence: 0.9 },
+          {
+            startTime: 3,
+            endTime: 4,
+            text: 'Another valid',
+            speaker: 'Speaker 1',
+            confidence: 0.9,
+          },
         ],
         speakers: ['Speaker 1'],
         duration: 4,
       });
 
       const parsed = diarizationService.parseDiarizationResponse(jsonResponse);
-      
+
       // Empty or whitespace-only segments should be filtered
       expect(parsed.segments.length).toBe(2);
       expect(parsed.segments.every(s => s.text.trim().length > 0)).toBe(true);
@@ -418,7 +421,7 @@ describe('DiarizationService Property Tests', () => {
         fc.property(
           fc.array(diarizedSegmentArbitrary, { minLength: 0, maxLength: 50 }),
           segments => {
-            const result: DiarizationResult = {
+            const _result: DiarizationResult = {
               segments,
               speakers: [],
               duration: Math.max(...segments.map(s => s.endTime), 0),
@@ -429,7 +432,7 @@ describe('DiarizationService Property Tests', () => {
 
             // Should have same number of unique speakers
             expect(extracted.length).toBe(expectedSpeakers.length);
-            
+
             // All extracted speakers should be in segments
             extracted.forEach((speaker: string) => {
               expect(segments.some((s: DiarizedSegment) => s.speaker === speaker)).toBe(true);
@@ -461,18 +464,21 @@ describe('DiarizationService Property Tests', () => {
     test('Audio path takes precedence over text input', async () => {
       mockGenerateContent.mockResolvedValueOnce({
         response: {
-          text: () => JSON.stringify({
-            segments: [{ startTime: 0, endTime: 5, text: 'Audio', speaker: 'Speaker 1', confidence: 0.9 }],
-            speakers: ['Speaker 1'],
-            duration: 5,
-          }),
+          text: () =>
+            JSON.stringify({
+              segments: [
+                { startTime: 0, endTime: 5, text: 'Audio', speaker: 'Speaker 1', confidence: 0.9 },
+              ],
+              speakers: ['Speaker 1'],
+              duration: 5,
+            }),
         },
       });
 
-      const fs = require('fs/promises');
+      const fs = require('node:fs/promises');
       fs.readFile.mockResolvedValueOnce(Buffer.from('fake audio data'));
 
-      const result = await diarizationService.diarize({
+      const _result = await diarizationService.diarize({
         audioPath: '/path/to/audio.mp3',
         text: 'This text should be ignored',
       });
@@ -486,15 +492,18 @@ describe('DiarizationService Property Tests', () => {
     test('Text input works when no audio path provided', async () => {
       mockGenerateContent.mockResolvedValueOnce({
         response: {
-          text: () => JSON.stringify({
-            segments: [{ startTime: 0, endTime: 5, text: 'Text', speaker: 'Speaker 1', confidence: 0.9 }],
-            speakers: ['Speaker 1'],
-            duration: 5,
-          }),
+          text: () =>
+            JSON.stringify({
+              segments: [
+                { startTime: 0, endTime: 5, text: 'Text', speaker: 'Speaker 1', confidence: 0.9 },
+              ],
+              speakers: ['Speaker 1'],
+              duration: 5,
+            }),
         },
       });
 
-      const result = await diarizationService.diarize({
+      const _result = await diarizationService.diarize({
         text: 'Some text content',
       });
 
@@ -544,4 +553,3 @@ describe('DiarizationService Property Tests', () => {
     });
   });
 });
-

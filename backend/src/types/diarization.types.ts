@@ -23,12 +23,12 @@ export interface DiarizationOptions {
    * Example: { "Speaker 1": "Professor", "Speaker 2": "Student" }
    */
   speakerMapping?: Record<string, string>;
-  
+
   /**
    * Language hint for better diarization
    */
   language?: string;
-  
+
   /**
    * Minimum confidence threshold for speaker identification
    * Segments below this threshold may not have speaker labels
@@ -41,13 +41,13 @@ export interface DiarizationInput {
    * Audio file path (for audio-based diarization)
    */
   audioPath?: string;
-  
+
   /**
    * Text content (for text-based diarization or re-diarization)
    * If both audioPath and text are provided, audio takes precedence
    */
   text?: string;
-  
+
   /**
    * Existing segments with timestamps (for re-diarization)
    * Useful when you want to re-analyze speaker labels for existing transcript
@@ -58,4 +58,3 @@ export interface DiarizationInput {
     text: string;
   }>;
 }
-
