@@ -123,7 +123,7 @@
     - **Property 10: Speaker attribution validity**
     - **Validates: Requirements 4.5**
 
-- [ ] 8. Checkpoint - Ensure all tests pass
+- [x] 8. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 9. Implement action item extraction
