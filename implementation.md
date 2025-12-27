@@ -39,70 +39,70 @@
     - Return upload status and recording ID
     - _Requirements: 1.1, 1.4, 1.5_
 
-- [ ] 3. Implement authentication system
-  - [ ] 3.1 Create password validation utility
+- [x] 3. Implement authentication system
+  - [x] 3.1 Create password validation utility
     - Implement validation for 8+ characters, mixed case, number requirement
     - _Requirements: 7.1_
-  - [ ] 3.2 Write property test for password validation
+  - [x] 3.2 Write property test for password validation
     - **Property 17: Password validation**
     - **Validates: Requirements 7.1**
-  - [ ] 3.3 Implement user registration and login
+  - [x] 3.3 Implement user registration and login
     - Create user model and repository
     - Implement password hashing with bcrypt
     - Generate JWT tokens on successful login
     - _Requirements: 7.1, 7.2_
-  - [ ] 3.4 Write property tests for authentication
+  - [x] 3.4 Write property tests for authentication
     - **Property 18: Authentication success**
     - **Property 19: Authentication failure security**
     - **Validates: Requirements 7.2, 7.3**
-  - [ ] 3.5 Implement session management and token validation
+  - [x] 3.5 Implement session management and token validation
     - Create auth middleware for protected routes
     - Implement token expiration handling
     - _Requirements: 7.4_
-  - [ ] 3.6 Write property test for session expiration
+  - [x] 3.6 Write property test for session expiration
     - **Property 20: Session expiration**
     - **Validates: Requirements 7.4**
-  - [ ] 3.7 Create authentication API endpoints
+  - [x] 3.7 Create authentication API endpoints
     - POST /api/auth/register
     - POST /api/auth/login
     - POST /api/auth/logout
     - POST /api/auth/password-reset
     - _Requirements: 7.1, 7.2, 7.5_
 
-- [ ] 4. Checkpoint - Ensure all tests pass
+- [x] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Implement transcription service
-  - [ ] 5.1 Create transcription service with Google Gemini integration
+- [x] 5. Implement transcription service
+  - [x] 5.1 Create transcription service with Google Gemini integration
     - Implement Gemini API client using @google/generative-ai SDK
     - Use Gemini's multimodal capabilities to process audio files
     - Parse response into transcript segments with timestamps
     - Handle confidence scores for segments
     - _Requirements: 2.1, 2.3, 2.4_
-  - [ ] 5.2 Implement transcript storage and retrieval
+  - [x] 5.2 Implement transcript storage and retrieval
     - Create transcript repository
     - Store segments as JSONB
     - Associate transcripts with recordings
     - _Requirements: 2.2_
-  - [ ] 5.3 Write property tests for transcript processing
+  - [x] 5.3 Write property tests for transcript processing
     - **Property 4: Transcript-recording association**
     - **Property 5: Timestamp presence**
     - **Property 6: Low confidence marking**
     - **Validates: Requirements 2.2, 2.3, 2.4**
 
-- [ ] 6. Implement speaker diarization
-  - [ ] 6.1 Create diarization service with Gemini
+- [x] 6. Implement speaker diarization
+  - [x] 6.1 Create diarization service with Gemini
     - Use Gemini to analyze transcript and identify distinct speakers
     - Assign consistent speaker labels (Speaker 1, Speaker 2, etc.)
     - _Requirements: 3.1, 3.2_
-  - [ ] 6.2 Write property test for speaker label consistency
+  - [x] 6.2 Write property test for speaker label consistency
     - **Property 7: Speaker label consistency**
     - **Validates: Requirements 3.2**
-  - [ ] 6.3 Implement speaker name customization
+  - [x] 6.3 Implement speaker name customization
     - Add endpoint to update speaker names
     - Replace generic labels with custom names in transcript and summary
     - _Requirements: 3.4_
-  - [ ] 6.4 Write property test for speaker name replacement
+  - [x] 6.4 Write property test for speaker name replacement
     - **Property 8: Speaker name replacement**
     - **Validates: Requirements 3.4**
 

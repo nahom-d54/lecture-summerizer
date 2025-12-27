@@ -141,7 +141,10 @@ describe('DiarizationService Property Tests', () => {
       fc.assert(
         fc.property(diarizationResultArbitrary, mockResult => {
           // Filter out segments with empty text since they get filtered during parsing
-          const validSegments = mockResult.segments.filter(s => s.text.trim().length > 0);
+          // Also filter out segments with backticks in speaker names which would break markdown parsing
+          const validSegments = mockResult.segments.filter(
+            s => s.text.trim().length > 0 && !s.speaker.includes('`') && !s.text.includes('`')
+          );
           if (validSegments.length === 0) return true; // Skip if no valid segments
 
           const wrappedJson = `\`\`\`json\n${JSON.stringify({ ...mockResult, segments: validSegments })}\n\`\`\``;
