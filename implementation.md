@@ -106,20 +106,20 @@
     - **Property 8: Speaker name replacement**
     - **Validates: Requirements 3.4**
 
-- [ ] 7. Implement summarization service
-  - [ ] 7.1 Create summarization service with Gemini
+- [x] 7. Implement summarization service
+  - [x] 7.1 Create summarization service with Gemini
     - Use Gemini API for summary generation
     - Design structured prompts for section headings and speaker attributions
     - Enforce summary length constraint (20% of transcript) via prompt engineering
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
-  - [ ] 7.2 Write property test for summary length constraint
+  - [x] 7.2 Write property test for summary length constraint
     - **Property 9: Summary length constraint**
     - **Validates: Requirements 4.2**
-  - [ ] 7.3 Implement speaker attribution in summaries
+  - [x] 7.3 Implement speaker attribution in summaries
     - Extract and store speaker attributions for key statements
     - Validate speaker IDs exist in transcript
     - _Requirements: 4.5_
-  - [ ] 7.4 Write property test for speaker attribution validity
+  - [x] 7.4 Write property test for speaker attribution validity
     - **Property 10: Speaker attribution validity**
     - **Validates: Requirements 4.5**
 
