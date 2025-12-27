@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import actionItemRoutes from './action-item.routes';
 import authRoutes from './auth.routes';
 import queueRoutes from './queue.routes';
 import uploadRoutes from './upload.routes';
@@ -18,6 +19,10 @@ router.use('/auth', authRoutes);
 
 // Queue management routes
 router.use('/queues', queueRoutes);
+
+// Action Item routes
+
+router.use('/', actionItemRoutes);
 
 // Upload/Recording routes
 router.use('/recordings', uploadRoutes);
