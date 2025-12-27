@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { actionItemController } from '@/controllers/action-item.controller';
 import { authenticateToken } from '@/middleware/authMiddleware'; // Matches your provided file
 
-const router = Router();
+const router: Router = Router();
 
 // 1. Generate Action Items (AI Trigger)
 // POST /api/recordings/123/action-items
