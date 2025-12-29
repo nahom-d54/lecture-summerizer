@@ -2,7 +2,7 @@ import { Router } from 'express';
 import actionItemRoutes from './action-item.routes';
 import authRoutes from './auth.routes';
 import queueRoutes from './queue.routes';
-import uploadRoutes from './upload.routes';
+import recordingRoutes from './recording.routes';
 
 const router: Router = Router();
 
@@ -25,6 +25,6 @@ router.use('/queues', queueRoutes);
 router.use('/', actionItemRoutes);
 
 // Upload/Recording routes
-router.use('/recordings', uploadRoutes);
+router.use('/recordings', recordingRoutes);
 
 export default router;
