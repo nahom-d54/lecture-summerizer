@@ -91,4 +91,44 @@ describe('ActionItemService', () => {
       expect(actionItemRepository.update).toHaveBeenCalledWith(itemId, { completed: false });
     });
   });
+
+  describe('Property 13: Transcript reference validity', () => {
+    test('Action items should have valid segment references when quote matches', async () => {
+      (transcriptRepository.findByRecordingId as jest.Mock).mockResolvedValue(mockTranscript);
+      mockGenerateContent.mockResolvedValue({ response: { text: () => mockGeminiResponse } });
+
+      await service.generateActionItems(mockRecordingId);
+
+      // Verify that segmentStartTime is set when quote matches a segment
+      expect(actionItemRepository.createMany).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({
+            segmentStartTime: 10, // Should match the segment's startTime
+          }),
+        ])
+      );
+    });
+
+    test('Action items should have null segment reference when no quote match', async () => {
+      (transcriptRepository.findByRecordingId as jest.Mock).mockResolvedValue(mockTranscript);
+      mockGenerateContent.mockResolvedValue({
+        response: {
+          text: () =>
+            JSON.stringify([
+              { description: 'Unmatched task', quote: 'This text does not exist in transcript' },
+            ]),
+        },
+      });
+
+      await service.generateActionItems(mockRecordingId);
+
+      expect(actionItemRepository.createMany).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({
+            segmentStartTime: null,
+          }),
+        ])
+      );
+    });
+  });
 });

@@ -84,4 +84,81 @@ describe('ExportService', () => {
 
     await expect(exportService.generateTXT(recordingId)).rejects.toThrow('Recording not found');
   });
+
+  describe('Property 21: Export format correctness', () => {
+    it('PDF export should return valid PDF buffer', async () => {
+      (prisma.recording.findUnique as jest.Mock).mockResolvedValue(mockRecording);
+
+      const result = await exportService.generatePDF(recordingId);
+
+      expect(Buffer.isBuffer(result)).toBe(true);
+      // PDF files start with %PDF
+      expect(result.toString('utf8', 0, 4)).toBe('%PDF');
+    });
+
+    it('TXT export should return plain text string', async () => {
+      (prisma.recording.findUnique as jest.Mock).mockResolvedValue(mockRecording);
+
+      const result = await exportService.generateTXT(recordingId);
+
+      expect(typeof result).toBe('string');
+      expect(result.length).toBeGreaterThan(0);
+    });
+
+    it('DOCX export should return valid DOCX buffer', async () => {
+      (prisma.recording.findUnique as jest.Mock).mockResolvedValue(mockRecording);
+
+      const result = await exportService.generateDOCX(recordingId);
+
+      expect(Buffer.isBuffer(result)).toBe(true);
+      // DOCX files are ZIP archives starting with PK
+      expect(result.toString('utf8', 0, 2)).toBe('PK');
+    });
+  });
+
+  describe('Property 22: Export content completeness', () => {
+    it('Export should include recording title', async () => {
+      (prisma.recording.findUnique as jest.Mock).mockResolvedValue(mockRecording);
+
+      const result = await exportService.generateTXT(recordingId);
+
+      expect(result).toContain('Test Lecture');
+    });
+
+    it('Export should include recording date', async () => {
+      (prisma.recording.findUnique as jest.Mock).mockResolvedValue(mockRecording);
+
+      const result = await exportService.generateTXT(recordingId);
+
+      expect(result).toContain('Date:');
+    });
+
+    it('Export should include summary content', async () => {
+      (prisma.recording.findUnique as jest.Mock).mockResolvedValue(mockRecording);
+
+      const result = await exportService.generateTXT(recordingId);
+
+      expect(result).toContain('SUMMARY');
+      expect(result).toContain('This is a test summary.');
+    });
+
+    it('Export should include action items as checklist', async () => {
+      (prisma.recording.findUnique as jest.Mock).mockResolvedValue(mockRecording);
+
+      const result = await exportService.generateTXT(recordingId);
+
+      expect(result).toContain('ACTION ITEMS');
+      expect(result).toContain('[ ]'); // Uncompleted item
+      expect(result).toContain('[x]'); // Completed item
+    });
+
+    it('Export should include assignee and deadline for action items', async () => {
+      (prisma.recording.findUnique as jest.Mock).mockResolvedValue(mockRecording);
+
+      const result = await exportService.generateTXT(recordingId);
+
+      expect(result).toContain('Alice'); // Assignee
+      expect(result).toContain('Due:'); // Deadline indicator
+    });
+  });
 });

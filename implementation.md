@@ -126,84 +126,84 @@
 - [x] 8. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. Implement action item extraction
-  - [ ] 9.1 Create action item extraction service with Gemini
+- [x] 9. Implement action item extraction
+  - [x] 9.1 Create action item extraction service with Gemini
     - Use Gemini to identify tasks, assignees, and deadlines from transcript
     - Return structured JSON with action item details
     - Store action items with transcript references
     - _Requirements: 5.1, 5.2, 5.5_
-  - [ ] 9.2 Write property tests for action item structure
+  - [x] 9.2 Write property tests for action item structure
     - **Property 11: Action item structure**
     - **Property 13: Transcript reference validity**
     - **Validates: Requirements 5.2, 5.5**
-  - [ ] 9.3 Implement action item management
+  - [x] 9.3 Implement action item management
     - Create endpoint to toggle completion status
     - Create endpoint to update action item details
     - _Requirements: 5.4_
-  - [ ] 9.4 Write property test for action item completion toggle
+  - [x] 9.4 Write property test for action item completion toggle
     - **Property 12: Action item completion toggle**
     - **Validates: Requirements 5.4**
 
-- [ ] 10. Implement processing pipeline orchestration
-  - [ ] 10.1 Set up Bull queue with Redis
+- [x] 10. Implement processing pipeline orchestration
+  - [x] 10.1 Set up Bull queue with Redis
     - Configure job queue for async processing
     - Implement job status tracking
     - _Requirements: 1.4_
-  - [ ] 10.2 Create processing pipeline coordinator
+  - [x] 10.2 Create processing pipeline coordinator
     - Orchestrate transcription → diarization → summarization → extraction flow
     - Update recording status at each stage
     - Handle failures and retries
     - _Requirements: 1.4, 2.1_
-  - [ ] 10.3 Create processing status API endpoint
+  - [x] 10.3 Create processing status API endpoint
     - GET /api/recordings/:id/status
     - Return current processing stage and progress
     - _Requirements: 1.4_
 
-- [ ] 11. Implement dashboard and recording management
-  - [ ] 11.1 Create recording repository and list endpoint
+- [x] 11. Implement dashboard and recording management
+  - [x] 11.1 Create recording repository and list endpoint
     - Implement paginated listing with user filtering
     - Include title, date, duration, status fields
     - _Requirements: 6.1, 6.2_
-  - [ ] 11.2 Write property test for recording data completeness
+  - [x] 11.2 Write property test for recording data completeness
     - **Property 14: Recording data completeness**
     - **Validates: Requirements 6.2**
-  - [ ] 11.3 Implement search functionality
+  - [x] 11.3 Implement search functionality
     - Add full-text search on transcripts
     - Filter by title, date range, keywords
     - _Requirements: 6.3_
-  - [ ] 11.4 Write property test for search result relevance
+  - [x] 11.4 Write property test for search result relevance
     - **Property 15: Search result relevance**
     - **Validates: Requirements 6.3**
-  - [ ] 11.5 Implement recording deletion with cascade
+  - [x] 11.5 Implement recording deletion with cascade
     - Delete recording, transcript, summary, and action items
     - Remove audio file from storage
     - _Requirements: 6.5_
-  - [ ] 11.6 Write property test for cascade deletion
+  - [x] 11.6 Write property test for cascade deletion
     - **Property 16: Cascade deletion**
     - **Validates: Requirements 6.5**
 
-- [ ] 12. Implement export service
-  - [ ] 12.1 Create export service with format generators
+- [x] 12. Implement export service
+  - [x] 12.1 Create export service with format generators
     - Implement PDF generation (using pdfkit or similar)
     - Implement TXT generation
     - Implement DOCX generation (using docx library)
     - _Requirements: 8.1_
-  - [ ] 12.2 Write property test for export format correctness
+  - [x] 12.2 Write property test for export format correctness
     - **Property 21: Export format correctness**
     - **Validates: Requirements 8.1**
-  - [ ] 12.3 Implement export content assembly
+  - [x] 12.3 Implement export content assembly
     - Include recording title, date, summary, action items
     - Format action items as checklist with assignee/deadline
     - _Requirements: 8.2, 8.3_
-  - [ ] 12.4 Write property test for export content completeness
+  - [x] 12.4 Write property test for export content completeness
     - **Property 22: Export content completeness**
     - **Validates: Requirements 8.2, 8.3**
-  - [ ] 12.5 Create export API endpoint
+  - [x] 12.5 Create export API endpoint
     - GET /api/recordings/:id/export?format=pdf|txt|docx
     - Return file download
     - _Requirements: 8.4_
 
-- [ ] 13. Checkpoint - Ensure all tests pass
+- [x] 13. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 14. Build frontend components
