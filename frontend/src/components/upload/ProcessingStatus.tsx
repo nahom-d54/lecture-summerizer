@@ -1,15 +1,6 @@
-import { useQuery } from '@tanstack/react-query';
 import { CheckCircle, Loader2, XCircle } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
-import { recordingsApi } from '@/lib/api';
-
-const stages = [
-  { key: 'uploading', label: 'Uploading' },
-  { key: 'transcribing', label: 'Transcribing' },
-  { key: 'summarizing', label: 'Summarizing' },
-  { key: 'extracting_action_items', label: 'Extracting Action Items' },
-  { key: 'completed', label: 'Completed' },
-];
+import { getStageProgress, PROCESSING_STAGES, useProcessingStatus } from '@/hooks';
 
 interface Props {
   recordingId: string;
@@ -17,22 +8,11 @@ interface Props {
 }
 
 export function ProcessingStatus({ recordingId, onComplete }: Props) {
-  const { data } = useQuery({
-    queryKey: ['recording-status', recordingId],
-    queryFn: () => recordingsApi.getStatus(recordingId),
-    refetchInterval: query => {
-      const status = query.state.data?.data?.data?.status;
-      if (status === 'completed' || status === 'failed') {
-        onComplete?.();
-        return false;
-      }
-      return 2000;
-    },
-  });
+  const { data } = useProcessingStatus(recordingId, { onComplete });
 
-  const currentStatus = data?.data?.data?.status || 'uploading';
-  const currentIndex = stages.findIndex(s => s.key === currentStatus);
-  const progress = currentStatus === 'completed' ? 100 : ((currentIndex + 1) / stages.length) * 100;
+  const currentStatus = data?.data?.status || 'uploading';
+  const currentIndex = PROCESSING_STAGES.findIndex(s => s.key === currentStatus);
+  const progress = getStageProgress(currentStatus);
   const isFailed = currentStatus === 'failed';
 
   return (
@@ -48,7 +28,7 @@ export function ProcessingStatus({ recordingId, onComplete }: Props) {
       />
 
       <div className="space-y-2">
-        {stages.map((stage, index) => {
+        {PROCESSING_STAGES.map((stage, index) => {
           const isComplete = currentIndex > index || currentStatus === 'completed';
           const isCurrent = currentIndex === index && currentStatus !== 'completed';
 

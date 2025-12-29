@@ -10,4 +10,5 @@ if (!apiKey) {
   console.warn('GEMINI_API_KEY is not defined in environment variables');
 }
 
+// Initialize with the correct API style
 export const gemini = new GoogleGenerativeAI(apiKey || 'dummy-key');

@@ -1,38 +1,28 @@
-import { useMutation } from '@tanstack/react-query';
 import { Download, FileText, FileType, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { recordingsApi } from '@/lib/api';
+import { useExport } from '@/hooks';
+import type { ExportFormat } from '@/types';
 
 interface Props {
   recordingId: string;
   title: string;
 }
 
-const formats = [
+const formats: { value: ExportFormat; label: string; icon: typeof FileType }[] = [
   { value: 'pdf', label: 'PDF', icon: FileType },
   { value: 'txt', label: 'Text', icon: FileText },
   { value: 'docx', label: 'Word', icon: FileText },
-] as const;
+];
 
 export function ExportButton({ recordingId, title }: Props) {
   const [open, setOpen] = useState(false);
+  const exportMutation = useExport({ recordingId, title });
 
-  const exportMutation = useMutation({
-    mutationFn: (format: 'pdf' | 'txt' | 'docx') => recordingsApi.export(recordingId, format),
-    onSuccess: (response, format) => {
-      const blob = new Blob([response.data], { type: response.headers['content-type'] });
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.${format}`;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      setOpen(false);
-    },
-  });
+  const handleExport = (format: ExportFormat) => {
+    exportMutation.mutate(format);
+    setOpen(false);
+  };
 
   return (
     <div className="relative">
@@ -60,7 +50,7 @@ export function ExportButton({ recordingId, title }: Props) {
                 type="button"
                 key={value}
                 className="flex items-center gap-2 w-full px-4 py-2 text-sm text-left hover:bg-gray-100 first:rounded-t-lg last:rounded-b-lg"
-                onClick={() => exportMutation.mutate(value)}
+                onClick={() => handleExport(value)}
               >
                 <Icon className="h-4 w-4" />
                 {label}

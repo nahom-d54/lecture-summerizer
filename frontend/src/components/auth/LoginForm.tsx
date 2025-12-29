@@ -28,8 +28,9 @@ export function LoginForm() {
     setLoading(true);
 
     try {
-      const { data } = await authApi.login(email, password);
-      setAuth(data.user, data.token);
+      const response = await authApi.login(email, password);
+      const { data } = response.data; // Backend returns { success: true, data: { userId, email, token } }
+      setAuth({ id: data.userId, email: data.email }, data.token);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed');

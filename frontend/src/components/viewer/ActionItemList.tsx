@@ -1,17 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Calendar, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { recordingsApi } from '@/lib/api';
-
-interface ActionItem {
-  id: string;
-  description: string;
-  assignee?: string;
-  deadline?: string;
-  completed: boolean;
-}
+import { useToggleActionItem } from '@/hooks';
+import type { ActionItem } from '@/types';
 
 interface Props {
   recordingId: string;
@@ -19,15 +11,7 @@ interface Props {
 }
 
 export function ActionItemList({ recordingId, items }: Props) {
-  const queryClient = useQueryClient();
-
-  const toggleMutation = useMutation({
-    mutationFn: ({ itemId, completed }: { itemId: string; completed: boolean }) =>
-      recordingsApi.updateActionItem(recordingId, itemId, completed),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['recording', recordingId] });
-    },
-  });
+  const toggleMutation = useToggleActionItem(recordingId);
 
   if (!items || items.length === 0) {
     return (
@@ -53,7 +37,7 @@ export function ActionItemList({ recordingId, items }: Props) {
             <Checkbox
               checked={item.completed}
               onCheckedChange={checked =>
-                toggleMutation.mutate({ itemId: item.id, completed: !!checked })
+                toggleMutation.mutate({ actionItemId: item.id, completed: !!checked })
               }
               disabled={toggleMutation.isPending}
             />

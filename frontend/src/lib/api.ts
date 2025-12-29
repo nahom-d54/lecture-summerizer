@@ -30,15 +30,21 @@ api.interceptors.response.use(
 // Auth API
 export const authApi = {
   login: (email: string, password: string) =>
-    api.post<{ token: string; user: { id: string; email: string } }>('/auth/login', {
-      email,
-      password,
-    }),
+    api.post<{ success: boolean; data: { userId: string; email: string; token: string } }>(
+      '/auth/login',
+      {
+        email,
+        password,
+      }
+    ),
   register: (email: string, password: string) =>
-    api.post<{ token: string; user: { id: string; email: string } }>('/auth/register', {
-      email,
-      password,
-    }),
+    api.post<{ success: boolean; data: { userId: string; email: string; token: string } }>(
+      '/auth/register',
+      {
+        email,
+        password,
+      }
+    ),
   logout: () => api.post('/auth/logout'),
 };
 

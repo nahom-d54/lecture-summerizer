@@ -229,18 +229,18 @@
     - ExportButton with format dropdown
     - _Requirements: 2.5, 3.3, 4.4, 5.3, 5.4, 8.1_
 
-- [ ] 15. Wire up frontend with backend API
-  - [ ] 15.1 Create API client and authentication hooks
+- [x] 15. Wire up frontend with backend API
+  - [x] 15.1 Create API client and authentication hooks
     - Implement axios/fetch client with auth headers
     - Create useAuth hook for login state
     - Handle token refresh and expiration
     - _Requirements: 7.2, 7.4_
-  - [ ] 15.2 Create recording and processing hooks
+  - [x] 15.2 Create recording and processing hooks
     - useRecordings for list and search
     - useUpload for file upload with progress
     - useProcessingStatus for polling status
     - _Requirements: 1.4, 6.1, 6.3_
-  - [ ] 15.3 Create viewer data hooks
+  - [x] 15.3 Create viewer data hooks
     - useTranscript, useSummary, useActionItems
     - useExport for download handling
     - _Requirements: 2.5, 4.4, 5.3, 8.4_

@@ -185,7 +185,9 @@ describe('Recording Management', () => {
       // Simulate deletion flow
       const recording = await prisma.recording.findFirst({ where: { id: recordingId, userId } });
       await prisma.recording.delete({ where: { id: recordingId } });
-      await storageService.deleteFile(recording?.storagePath);
+      if (recording?.storagePath) {
+        await storageService.deleteFile(recording.storagePath);
+      }
 
       expect(prisma.recording.delete).toHaveBeenCalledWith({ where: { id: recordingId } });
       expect(storageService.deleteFile).toHaveBeenCalledWith(storagePath);

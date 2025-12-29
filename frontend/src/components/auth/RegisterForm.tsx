@@ -49,8 +49,9 @@ export function RegisterForm() {
 
     setLoading(true);
     try {
-      const { data } = await authApi.register(email, password);
-      setAuth(data.user, data.token);
+      const response = await authApi.register(email, password);
+      const { data } = response.data; // Backend returns { success: true, data: { userId, email, token } }
+      setAuth({ id: data.userId, email: data.email }, data.token);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Registration failed');
