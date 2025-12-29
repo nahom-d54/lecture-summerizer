@@ -1,5 +1,4 @@
 import * as fc from 'fast-check';
-import fs from 'fs/promises';
 import { StorageService } from './storage.service';
 
 // Mock fs/promises

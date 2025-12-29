@@ -1,9 +1,5 @@
 import * as fc from 'fast-check';
-import {
-  LOW_CONFIDENCE_THRESHOLD,
-  TranscriptionResult,
-  TranscriptSegment,
-} from '@/types/transcription.types';
+import { LOW_CONFIDENCE_THRESHOLD } from '@/types/transcription.types';
 import { TranscriptionService } from './transcription.service';
 
 // Mock dependencies
@@ -225,7 +221,7 @@ describe('TranscriptionService Property Tests', () => {
 
             // Mock the repository to return our segments
             transcriptRepository.getLowConfidenceSegments.mockImplementation(
-              (id: string, threshold: number) => {
+              (_id: string, threshold: number) => {
                 return Promise.resolve(segments.filter(s => s.confidence < threshold));
               }
             );
@@ -266,7 +262,7 @@ describe('TranscriptionService Property Tests', () => {
     test('JSON in markdown code blocks is extracted correctly', () => {
       fc.assert(
         fc.property(transcriptionResultArbitrary, mockResult => {
-          const wrappedJson = '```json\n' + JSON.stringify(mockResult) + '\n```';
+          const wrappedJson = `\`\`\`json\n${JSON.stringify(mockResult)}\n\`\`\``;
 
           const parsed = transcriptionService.parseTranscriptionResponse(wrappedJson);
 

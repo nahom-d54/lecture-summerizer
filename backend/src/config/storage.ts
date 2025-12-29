@@ -1,4 +1,4 @@
-import path from 'path';
+import path from 'node:path';
 
 export const storageConfig = {
   uploadDir: process.env.UPLOAD_DIR || path.join(process.cwd(), 'uploads'),

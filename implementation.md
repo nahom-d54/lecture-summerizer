@@ -206,23 +206,23 @@
 - [x] 13. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 14. Build frontend components
-  - [ ] 14.1 Create authentication components
+- [x] 14. Build frontend components
+  - [x] 14.1 Create authentication components
     - LoginForm with email/password validation
     - RegisterForm with password requirements display
     - PasswordReset request form
     - _Requirements: 7.1, 7.2, 7.5_
-  - [ ] 14.2 Create dashboard components
+  - [x] 14.2 Create dashboard components
     - RecordingList with pagination
     - RecordingCard with status, title, date display
     - SearchBar with filters
     - _Requirements: 6.1, 6.2, 6.3_
-  - [ ] 14.3 Create upload components
+  - [x] 14.3 Create upload components
     - AudioUploader with drag-and-drop
     - ProgressIndicator for upload and processing status
     - Format and size validation feedback
     - _Requirements: 1.1, 1.2, 1.3, 1.4_
-  - [ ] 14.4 Create viewer components
+  - [x] 14.4 Create viewer components
     - TranscriptViewer with speaker labels and timestamps
     - SummaryViewer with section headings
     - ActionItemList with completion toggles

@@ -1,5 +1,5 @@
-import fs from 'fs/promises';
-import path from 'path';
+import fs from 'node:fs/promises';
+import path from 'node:path';
 import { gemini } from '@/config/gemini';
 import { logger } from '@/config/logger';
 import { CreateTranscriptData, transcriptRepository } from '@/repositories/transcript.repository';
@@ -189,7 +189,7 @@ Rules:
    * Normalize segments to ensure consistent structure
    */
   private normalizeSegments(segments: unknown[]): TranscriptSegment[] {
-    return segments.map((seg: unknown, index: number) => {
+    return segments.map((seg: unknown, _index: number) => {
       const segment = seg as Record<string, unknown>;
       return {
         startTime: Number(segment.startTime) || 0,

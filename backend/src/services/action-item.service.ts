@@ -62,9 +62,8 @@ export class ActionItemService {
         let matchedSegment = null;
 
         if (item.quote && typeof item.quote === 'string') {
-          matchedSegment = segments.find(
-            seg =>
-              seg.text && seg.text.toLowerCase().includes(item.quote.toLowerCase().substring(0, 20))
+          matchedSegment = segments.find(seg =>
+            seg.text?.toLowerCase().includes(item.quote.toLowerCase().substring(0, 20))
           );
         }
 

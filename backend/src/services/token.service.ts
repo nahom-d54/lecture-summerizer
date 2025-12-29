@@ -100,7 +100,7 @@ export class TokenService {
     try {
       const decoded = jwt.decode(token) as TokenPayload;
       return decoded;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }

@@ -1,4 +1,4 @@
-import { Prisma, Summary } from '@prisma/client';
+import { Summary } from '@prisma/client';
 import { logger } from '@/config/logger';
 import { prisma } from '@/config/prisma';
 import { SummaryResult } from '@/types/summarization.types';

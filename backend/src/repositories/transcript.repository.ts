@@ -1,4 +1,4 @@
-import { Prisma, Transcript } from '@prisma/client';
+import { Transcript } from '@prisma/client';
 import { logger } from '@/config/logger';
 import { prisma } from '@/config/prisma';
 import { TranscriptSegment } from '@/types/transcription.types';

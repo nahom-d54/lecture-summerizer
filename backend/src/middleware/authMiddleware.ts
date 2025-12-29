@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { logger } from '@/config/logger';
 import { TokenPayload, tokenService } from '@/services/token.service';
-import { AppError } from './errorHandler';
 
 /**
  * Extend Express Request to include user data from JWT
@@ -74,7 +73,7 @@ export const authenticateToken = (req: Request, res: Response, next: NextFunctio
  * Optional: Helper function to check if user is authenticated
  * Can be used for middleware that allows both authenticated and unauthenticated requests
  */
-export const optionalAuthenticateToken = (req: Request, res: Response, next: NextFunction) => {
+export const optionalAuthenticateToken = (req: Request, _res: Response, next: NextFunction) => {
   try {
     const authHeader = req.headers.authorization;
 

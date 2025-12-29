@@ -2,7 +2,6 @@ import * as fc from 'fast-check';
 import { gemini } from '@/config/gemini';
 import { summaryRepository } from '@/repositories/summary.repository';
 import { transcriptRepository } from '@/repositories/transcript.repository';
-import { SummaryResult } from '@/types/summarization.types';
 import { SummarizationService } from './summarization.service';
 
 // Mock dependencies
@@ -187,7 +186,7 @@ describe('SummarizationService', () => {
 
       expect(result.speakerAttributions).toBeDefined();
       expect(result.speakerAttributions).toHaveLength(1);
-      expect(result.speakerAttributions![0]).toEqual({
+      expect(result.speakerAttributions?.[0]).toEqual({
         statement: 'Key statement',
         speaker: 'Speaker 1',
         context: 'During introduction',
