@@ -11,9 +11,9 @@ interface ExtractedItem {
   quote: string;
 }
 
-export class ActionItemService {
-  private model = gemini.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const MODEL_NAME = 'gemini-2.0-flash';
 
+export class ActionItemService {
   // 9.1 Generate and store action items from transcript
 
   async generateActionItems(recordingId: string) {
@@ -43,9 +43,12 @@ export class ActionItemService {
         Example: [{"description": "Send email", "assignee": "John", "deadline": "2023-10-20", "quote": "John needs to email"}]
       `;
 
-      // 3. Call Gemini
-      const result = await this.model.generateContent(prompt);
-      const responseText = result.response.text();
+      // 3. Call Gemini with new SDK
+      const response = await gemini.models.generateContent({
+        model: MODEL_NAME,
+        contents: prompt,
+      });
+      const responseText = response.text || '';
 
       // 4. Parse JSON
       const items: ExtractedItem[] = this.parseResponse(responseText);

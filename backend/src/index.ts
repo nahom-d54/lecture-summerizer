@@ -1,16 +1,16 @@
-import 'dotenv/config';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { Application, Request, Response } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
+
+// Load environment variables FIRST with absolute path
+dotenv.config({ path: path.resolve(__dirname, '../.env') });
+
 import { logger } from '@/config/logger';
 import { errorHandler } from '@/middleware/errorHandler';
 import apiRoutes from '@/routes';
-
-// Load environment variables with absolute path
-dotenv.config({ path: path.join(__dirname, '../.env') });
 
 const app: Application = express();
 const PORT = process.env.PORT || 5000;

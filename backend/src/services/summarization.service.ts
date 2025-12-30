@@ -4,9 +4,9 @@ import { summaryRepository } from '@/repositories/summary.repository';
 import { transcriptRepository } from '@/repositories/transcript.repository';
 import { SummarizationOptions, SummaryResult } from '@/types/summarization.types';
 
-export class SummarizationService {
-  private model = gemini.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const MODEL_NAME = 'gemini-2.0-flash';
 
+export class SummarizationService {
   /**
    * Generate a summary for a recording based on its transcript
    */
@@ -24,7 +24,6 @@ export class SummarizationService {
       }
 
       // 2. Prepare text for summarization
-      // Use the full text if available, otherwise potentially use segments
       const textToSummarize = transcript.fullText;
 
       if (!textToSummarize) {
@@ -34,10 +33,13 @@ export class SummarizationService {
       // 3. Build prompt
       const prompt = this.buildSummarizationPrompt(textToSummarize, options);
 
-      // 4. Call Gemini API
-      const result = await this.model.generateContent(prompt);
-      const response = result.response;
-      const responseText = response.text();
+      // 4. Call Gemini API with new SDK
+      const response = await gemini.models.generateContent({
+        model: MODEL_NAME,
+        contents: prompt,
+      });
+
+      const responseText = response.text || '';
 
       // 5. Parse response
       const summaryResult = this.parseSummaryResponse(responseText);

@@ -1,14 +1,14 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GoogleGenAI } from '@google/genai';
 import dotenv from 'dotenv';
+import path from 'path';
 
-dotenv.config();
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 
 const apiKey = process.env.GEMINI_API_KEY;
 
 if (!apiKey) {
-  // We don't throw error immediately to allow build/test without key, but logic should handle it
   console.warn('GEMINI_API_KEY is not defined in environment variables');
 }
 
-// Initialize with the correct API style
-export const gemini = new GoogleGenerativeAI(apiKey || 'dummy-key');
+// Initialize with the new Google GenAI SDK
+export const gemini = new GoogleGenAI({ apiKey: apiKey || 'dummy-key' });

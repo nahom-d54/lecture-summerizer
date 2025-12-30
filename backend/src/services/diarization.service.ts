@@ -12,9 +12,9 @@ import {
 // Supported audio formats for Gemini
 const SUPPORTED_AUDIO_FORMATS = ['audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm'];
 
-export class DiarizationService {
-  private model = gemini.getGenerativeModel({ model: 'gemini-1.5-flash' });
+const MODEL_NAME = 'gemini-2.0-flash';
 
+export class DiarizationService {
   /**
    * Perform speaker diarization on audio or text input
    * Identifies "Who spoke when" with timestamps
@@ -64,19 +64,26 @@ export class DiarizationService {
     // Build the prompt for diarization
     const prompt = this.buildDiarizationPrompt(options);
 
-    // Call Gemini API with multimodal input
-    const result = await this.model.generateContent([
-      {
-        inlineData: {
-          mimeType,
-          data: audioBase64,
+    // Call Gemini API with new SDK
+    const response = await gemini.models.generateContent({
+      model: MODEL_NAME,
+      contents: [
+        {
+          role: 'user',
+          parts: [
+            {
+              inlineData: {
+                mimeType,
+                data: audioBase64,
+              },
+            },
+            { text: prompt },
+          ],
         },
-      },
-      { text: prompt },
-    ]);
+      ],
+    });
 
-    const response = result.response;
-    const responseText = response.text();
+    const responseText = response.text || '';
 
     // Parse the response into structured diarization result
     const diarizationResult = this.parseDiarizationResponse(responseText);
@@ -114,10 +121,12 @@ export class DiarizationService {
     // Build the prompt for text-based diarization
     const prompt = this.buildTextDiarizationPrompt(textContent, options);
 
-    // Call Gemini API
-    const result = await this.model.generateContent([{ text: prompt }]);
-    const response = result.response;
-    const responseText = response.text();
+    // Call Gemini API with new SDK
+    const response = await gemini.models.generateContent({
+      model: MODEL_NAME,
+      contents: prompt,
+    });
+    const responseText = response.text || '';
 
     // Parse the response
     const diarizationResult = this.parseDiarizationResponse(responseText);
