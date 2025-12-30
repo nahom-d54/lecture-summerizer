@@ -33,14 +33,23 @@ def get_diarization_pipeline():
     """
     Lazy-load pyannote diarization pipeline.
     Requires HuggingFace token with access to pyannote models.
+    Returns None if pyannote is not installed.
     """
     global _diarization_pipeline
+    
+    # Check if pyannote is installed
+    try:
+        from pyannote.audio import Pipeline
+    except ImportError:
+        logger.warning("pyannote.audio not installed. Speaker diarization is disabled.")
+        logger.warning("To enable: pip install pyannote.audio>=3.1.0")
+        return None
+    
     if _diarization_pipeline is None:
         if not config.HF_TOKEN:
             raise ValueError("HF_TOKEN required for speaker diarization. Get one from https://huggingface.co/settings/tokens")
         
         logger.info("Loading pyannote diarization pipeline...")
-        from pyannote.audio import Pipeline
         _diarization_pipeline = Pipeline.from_pretrained(
             "pyannote/speaker-diarization-3.1",
             use_auth_token=config.HF_TOKEN
@@ -102,6 +111,17 @@ def transcribe_audio(
             "language": detected_language,
             "duration": round(duration, 2),
             "text": full_text
+        }
+    
+    # Check if diarization is available
+    pipeline = get_diarization_pipeline()
+    if pipeline is None:
+        logger.warning("Diarization requested but pyannote not installed. Returning plain transcript.")
+        return {
+            "language": detected_language,
+            "duration": round(duration, 2),
+            "text": full_text,
+            "diarization_error": "pyannote.audio not installed"
         }
     
     # Run speaker diarization
