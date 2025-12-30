@@ -45,28 +45,38 @@ export function TranscriptViewer({ segments, speakers = [] }: Props) {
     );
   }
 
+  // Check if we have speaker information
+  const hasSpeakers = segments.some(seg => seg.speaker);
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Transcript</CardTitle>
+        <CardTitle className="text-lg">
+          Transcript
+          {hasSpeakers && speakers.length > 0 && (
+            <span className="text-sm font-normal text-gray-500 ml-2">
+              ({speakers.length} {speakers.length === 1 ? 'speaker' : 'speakers'})
+            </span>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3 max-h-[500px] overflow-y-auto">
         {segments.map((segment, index) => (
-          <div key={index} className="flex gap-3">
-            <span className="text-xs text-gray-400 w-12 flex-shrink-0 pt-1">
+          <div key={index} className="flex gap-3 hover:bg-gray-50 p-2 rounded transition-colors">
+            <span className="text-xs text-gray-500 font-mono w-14 flex-shrink-0 pt-1">
               {formatTime(segment.startTime)}
             </span>
             <div className="flex-1">
               {segment.speaker && (
                 <Badge
                   variant="outline"
-                  className={`mb-1 text-xs ${getSpeakerColor(segment.speaker)}`}
+                  className={`mb-1 text-xs font-medium ${getSpeakerColor(segment.speaker)}`}
                 >
                   {segment.speaker}
                 </Badge>
               )}
               <p
-                className={`text-sm ${segment.confidence && segment.confidence < 0.7 ? 'text-gray-400 italic' : ''}`}
+                className={`text-sm leading-relaxed ${segment.confidence && segment.confidence < 0.7 ? 'text-gray-400 italic' : 'text-gray-700'}`}
               >
                 {segment.text}
               </p>

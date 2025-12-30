@@ -105,12 +105,25 @@ def transcribe_audio(
     segments = result.get("segments", [])
     duration = segments[-1]["end"] if segments else 0
     
-    # If diarization is disabled, return simple format
+    # If diarization is disabled, return segments without speaker labels
     if not use_diarization:
+        # Convert Whisper segments to our format (without speakers)
+        simple_segments = []
+        for seg in segments:
+            seg_text = seg.get("text", "").strip()
+            if seg_text:
+                simple_segments.append({
+                    "speaker": None,
+                    "start": round(seg["start"], 2),
+                    "end": round(seg["end"], 2),
+                    "text": seg_text
+                })
+        
         return {
             "language": detected_language,
             "duration": round(duration, 2),
-            "text": full_text
+            "text": full_text,
+            "segments": simple_segments  # Include segments even without diarization
         }
     
     # Check if diarization is available
