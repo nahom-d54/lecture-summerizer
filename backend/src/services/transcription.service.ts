@@ -1,6 +1,9 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
-import { gemini } from '@/config/gemini';
+/**
+ * Transcription Service
+ *
+ * Calls the Python Whisper transcription service for speech-to-text.
+ * NO LONGER uses Gemini for transcription - Gemini is only for summarization.
+ */
 import { logger } from '@/config/logger';
 import { CreateTranscriptData, transcriptRepository } from '@/repositories/transcript.repository';
 import { storageService } from '@/services/storage.service';
@@ -11,14 +14,27 @@ import {
   TranscriptSegment,
 } from '@/types/transcription.types';
 
-// Supported audio formats for Gemini
-const SUPPORTED_AUDIO_FORMATS = ['audio/mp3', 'audio/mpeg', 'audio/wav', 'audio/ogg', 'audio/webm'];
+// Python transcription service URL
+const TRANSCRIPTION_SERVICE_URL = process.env.TRANSCRIPTION_SERVICE_URL || 'http://localhost:8000';
 
-const MODEL_NAME = 'gemini-2.0-flash';
+// Response from Python transcription service
+interface WhisperResponse {
+  success: boolean;
+  language?: string;
+  duration?: number;
+  text?: string;
+  segments?: Array<{
+    speaker: string;
+    start: number;
+    end: number;
+    text: string;
+  }>;
+  error?: string;
+}
 
 export class TranscriptionService {
   /**
-   * Transcribe an audio file using Google Gemini
+   * Transcribe an audio file using the Python Whisper service
    */
   async transcribeAudio(
     filePath: string,
@@ -27,43 +43,31 @@ export class TranscriptionService {
     try {
       logger.info(`Starting transcription for file: ${filePath}`);
 
-      // Read the audio file
-      const audioBuffer = await fs.readFile(filePath);
-      const mimeType = this.getMimeType(filePath);
-
-      if (!SUPPORTED_AUDIO_FORMATS.includes(mimeType)) {
-        throw new Error(`Unsupported audio format: ${mimeType}`);
-      }
-
-      // Convert to base64 for Gemini API
-      const audioBase64 = audioBuffer.toString('base64');
-
-      // Build the prompt for transcription
-      const prompt = this.buildTranscriptionPrompt(options);
-
-      // Call Gemini API with the new SDK
-      const response = await gemini.models.generateContent({
-        model: MODEL_NAME,
-        contents: [
-          {
-            role: 'user',
-            parts: [
-              {
-                inlineData: {
-                  mimeType,
-                  data: audioBase64,
-                },
-              },
-              { text: prompt },
-            ],
-          },
-        ],
+      // Call Python transcription service
+      const response = await fetch(`${TRANSCRIPTION_SERVICE_URL}/transcribe-path`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          audio_path: filePath,
+          enable_diarization: options.enableSpeakerDiarization || false,
+          language: options.language || null,
+        }),
       });
 
-      const responseText = response.text || '';
+      if (!response.ok) {
+        throw new Error(`Transcription service error: ${response.status} ${response.statusText}`);
+      }
 
-      // Parse the response into structured transcript
-      const transcriptionResult = this.parseTranscriptionResponse(responseText);
+      const result = (await response.json()) as WhisperResponse;
+
+      if (!result.success) {
+        throw new Error(result.error || 'Transcription failed');
+      }
+
+      // Convert Python service response to our internal format
+      const transcriptionResult = this.convertWhisperResponse(result);
 
       logger.info(`Transcription completed for file: ${filePath}`);
       return transcriptionResult;
@@ -110,132 +114,60 @@ export class TranscriptionService {
   }
 
   /**
-   * Build the transcription prompt for Gemini
+   * Convert Python Whisper service response to internal TranscriptionResult format
    */
-  private buildTranscriptionPrompt(options: TranscriptionOptions): string {
-    const languageHint = options.language ? `The audio is in ${options.language}.` : '';
-    const speakerHint = options.enableSpeakerDiarization
-      ? 'Identify different speakers and label them as Speaker 1, Speaker 2, etc.'
-      : '';
+  private convertWhisperResponse(response: WhisperResponse): TranscriptionResult {
+    const fullText = response.text || '';
+    const duration = response.duration || 0;
 
-    return `
-Transcribe this audio file accurately. ${languageHint} ${speakerHint}
+    // Extract unique speakers from segments
+    const speakers: string[] = [];
+    const segments: TranscriptSegment[] = [];
 
-Return the transcription in the following JSON format:
-{
-  "fullText": "The complete transcription as a single string",
-  "segments": [
-    {
-      "startTime": 0,
-      "endTime": 5.5,
-      "text": "Segment text here",
-      "speaker": "Speaker 1",
-      "confidence": 0.95
-    }
-  ],
-  "speakers": ["Speaker 1", "Speaker 2"],
-  "duration": 120
-}
+    if (response.segments && response.segments.length > 0) {
+      // Diarization was enabled - we have speaker-labeled segments
+      for (const seg of response.segments) {
+        // Track unique speakers
+        if (seg.speaker && !speakers.includes(seg.speaker)) {
+          speakers.push(seg.speaker);
+        }
 
-Rules:
-- startTime and endTime are in seconds
-- confidence is a value between 0 and 1 indicating transcription accuracy
-- Mark segments with unclear audio or uncertain words with lower confidence (below 0.7)
-- If speaker identification is not possible, omit the speaker field
-- Ensure all timestamps are present and sequential
-- Return ONLY valid JSON, no additional text
-`.trim();
-  }
-
-  /**
-   * Parse Gemini response into TranscriptionResult
-   */
-  parseTranscriptionResponse(responseText: string): TranscriptionResult {
-    try {
-      // Extract JSON from response (handle potential markdown code blocks)
-      let jsonStr = responseText;
-      const jsonMatch = responseText.match(/```(?:json)?\s*([\s\S]*?)```/);
-      if (jsonMatch) {
-        jsonStr = jsonMatch[1].trim();
+        segments.push({
+          startTime: seg.start,
+          endTime: seg.end,
+          text: seg.text,
+          speaker: seg.speaker,
+          confidence: 0.9, // Whisper is generally high confidence
+        });
       }
-
-      const parsed = JSON.parse(jsonStr);
-
-      // Validate and normalize the response
-      const result: TranscriptionResult = {
-        fullText: parsed.fullText || '',
-        segments: this.normalizeSegments(parsed.segments || []),
-        speakers: parsed.speakers || [],
-        duration: parsed.duration || 0,
-      };
-
-      // Validate timestamps are present
-      this.validateTimestamps(result.segments);
-
-      return result;
-    } catch (error) {
-      logger.error('Error parsing transcription response:', error);
-      // Return a fallback result with the raw text
-      return {
-        fullText: responseText,
-        segments: [
-          {
-            startTime: 0,
-            endTime: 0,
-            text: responseText,
-            confidence: 0.5, // Low confidence for unparsed response
-          },
-        ],
-        speakers: [],
-        duration: 0,
-      };
+    } else {
+      // No diarization - create a single segment with full text
+      segments.push({
+        startTime: 0,
+        endTime: duration,
+        text: fullText,
+        confidence: 0.9,
+      });
     }
-  }
 
-  /**
-   * Normalize segments to ensure consistent structure
-   */
-  private normalizeSegments(segments: unknown[]): TranscriptSegment[] {
-    return segments.map((seg: unknown, _index: number) => {
-      const segment = seg as Record<string, unknown>;
-      return {
-        startTime: Number(segment.startTime) || 0,
-        endTime: Number(segment.endTime) || 0,
-        text: String(segment.text || ''),
-        speaker: segment.speaker ? String(segment.speaker) : undefined,
-        confidence: Math.min(1, Math.max(0, Number(segment.confidence) || 0.5)),
-      };
-    });
-  }
-
-  /**
-   * Validate that all segments have timestamps
-   */
-  private validateTimestamps(segments: TranscriptSegment[]): void {
-    for (let i = 0; i < segments.length; i++) {
-      const segment = segments[i];
-      if (segment.startTime === undefined || segment.endTime === undefined) {
-        logger.warn(`Segment ${i} missing timestamps`);
-      }
-      if (segment.startTime > segment.endTime) {
-        logger.warn(`Segment ${i} has invalid timestamps: start > end`);
-      }
-    }
-  }
-
-  /**
-   * Get MIME type from file extension
-   */
-  private getMimeType(filePath: string): string {
-    const ext = path.extname(filePath).toLowerCase();
-    const mimeTypes: Record<string, string> = {
-      '.mp3': 'audio/mp3',
-      '.wav': 'audio/wav',
-      '.ogg': 'audio/ogg',
-      '.webm': 'audio/webm',
-      '.m4a': 'audio/mp4',
+    return {
+      fullText,
+      segments,
+      speakers,
+      duration,
     };
-    return mimeTypes[ext] || 'audio/mpeg';
+  }
+
+  /**
+   * Check if the Python transcription service is healthy
+   */
+  async checkHealth(): Promise<boolean> {
+    try {
+      const response = await fetch(`${TRANSCRIPTION_SERVICE_URL}/health`);
+      return response.ok;
+    } catch {
+      return false;
+    }
   }
 }
 

@@ -28,11 +28,24 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint
-app.get('/health', (_req: Request, res: Response) => {
+app.get('/health', async (_req: Request, res: Response) => {
+  // Check transcription service health
+  let transcriptionServiceStatus = 'unknown';
+  try {
+    const transcriptionUrl = process.env.TRANSCRIPTION_SERVICE_URL || 'http://localhost:8000';
+    const response = await fetch(`${transcriptionUrl}/health`);
+    transcriptionServiceStatus = response.ok ? 'ok' : 'error';
+  } catch {
+    transcriptionServiceStatus = 'unavailable';
+  }
+
   res.status(200).json({
     status: 'ok',
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
+    services: {
+      transcription: transcriptionServiceStatus,
+    },
   });
 });
 

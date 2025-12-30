@@ -1,0 +1,15 @@
+# Core transcription
+openai-whisper==20231117
+torch>=2.0.0
+
+# Optional speaker diarization
+pyannote.audio>=3.1.0
+
+# API server
+fastapi>=0.109.0
+uvicorn>=0.27.0
+python-multipart>=0.0.6
+
+# Utilities
+pydantic>=2.5.0
+python-dotenv>=1.0.0

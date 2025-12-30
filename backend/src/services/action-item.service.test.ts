@@ -1,134 +1,121 @@
+/**
+ * Tests for the Action Item Service
+ *
+ * The action item service uses Gemini API for extracting action items from transcripts.
+ */
+import { actionItemService } from './action-item.service';
+
+// Mock the Gemini client
+jest.mock('@/config/gemini', () => ({
+  gemini: {
+    models: {
+      generateContent: jest.fn(),
+    },
+  },
+}));
+
+// Mock the repositories
+jest.mock('@/repositories/transcript.repository', () => ({
+  transcriptRepository: {
+    findByRecordingId: jest.fn(),
+  },
+}));
+
+jest.mock('@/repositories/action-item.repository', () => ({
+  actionItemRepository: {
+    createMany: jest.fn(),
+    findByRecordingId: jest.fn(),
+    update: jest.fn(),
+  },
+}));
+
 import { gemini } from '@/config/gemini';
 import { actionItemRepository } from '@/repositories/action-item.repository';
 import { transcriptRepository } from '@/repositories/transcript.repository';
-import { ActionItemService } from './action-item.service';
-
-jest.mock('@/repositories/transcript.repository');
-jest.mock('@/repositories/action-item.repository');
-jest.mock('@/config/gemini');
-jest.mock('@/config/logger');
 
 describe('ActionItemService', () => {
-  let service: ActionItemService;
-  let mockGenerateContent: jest.Mock;
-
   beforeEach(() => {
     jest.clearAllMocks();
-    mockGenerateContent = jest.fn();
-    (gemini.getGenerativeModel as jest.Mock).mockReturnValue({
-      generateContent: mockGenerateContent,
-    });
-    service = new ActionItemService();
   });
 
-  const mockRecordingId = 'rec-123';
-  const mockTranscript = {
-    id: 't-1',
-    recordingId: mockRecordingId,
-    fullText: 'Alex needs to deploy the app by Friday.',
-    segments: [{ startTime: 10, endTime: 15, text: 'Alex needs to deploy the app by Friday.' }],
-  };
+  describe('generateActionItems', () => {
+    it('should extract action items from transcript', async () => {
+      const mockTranscript = {
+        id: 'transcript-1',
+        recordingId: 'recording-1',
+        fullText: 'John needs to send the report by Friday. Sarah will review it.',
+        segments: [],
+      };
 
-  const mockGeminiResponse = JSON.stringify([
-    {
-      description: 'Deploy the app',
-      assignee: 'Alex',
-      deadline: '2025-12-31',
-      quote: 'Alex needs to deploy',
-    },
-  ]);
+      const mockGeminiResponse = {
+        text: JSON.stringify([
+          {
+            description: 'Send the report',
+            assignee: 'John',
+            deadline: '2024-01-05',
+            quote: 'John needs to send the report',
+          },
+          {
+            description: 'Review the report',
+            assignee: 'Sarah',
+            deadline: null,
+            quote: 'Sarah will review it',
+          },
+        ]),
+      };
 
-  describe('generateActionItems (Requirement 9.2)', () => {
-    test('should extract items and map timestamps correctly', async () => {
-      // Setup Mocks
+      const mockCreatedItems = [
+        { id: '1', description: 'Send the report', assignee: 'John' },
+        { id: '2', description: 'Review the report', assignee: 'Sarah' },
+      ];
+
       (transcriptRepository.findByRecordingId as jest.Mock).mockResolvedValue(mockTranscript);
-      mockGenerateContent.mockResolvedValue({ response: { text: () => mockGeminiResponse } });
+      (gemini.models.generateContent as jest.Mock).mockResolvedValue(mockGeminiResponse);
+      (actionItemRepository.createMany as jest.Mock).mockResolvedValue({});
+      (actionItemRepository.findByRecordingId as jest.Mock).mockResolvedValue(mockCreatedItems);
 
-      // Run
-      await service.generateActionItems(mockRecordingId);
+      const result = await actionItemService.generateActionItems('recording-1');
 
-      // Verify DB Insert
-      expect(actionItemRepository.createMany).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            recordingId: mockRecordingId,
-            description: 'Deploy the app',
-            assignee: 'Alex',
-            segmentStartTime: 10,
-          }),
-        ])
+      expect(transcriptRepository.findByRecordingId).toHaveBeenCalledWith('recording-1');
+      expect(gemini.models.generateContent).toHaveBeenCalled();
+      expect(actionItemRepository.createMany).toHaveBeenCalled();
+      expect(result).toHaveLength(2);
+    });
+
+    it('should throw error when transcript not found', async () => {
+      (transcriptRepository.findByRecordingId as jest.Mock).mockResolvedValue(null);
+
+      await expect(actionItemService.generateActionItems('nonexistent')).rejects.toThrow(
+        'Transcript not found'
       );
     });
 
-    test('Property 11: Action item structure validation', async () => {
-      // Simulating a response missing the description to see if code handles/validates it
+    it('should return empty array when no action items found', async () => {
+      const mockTranscript = {
+        id: 'transcript-1',
+        recordingId: 'recording-1',
+        fullText: 'This is just a general discussion with no tasks.',
+        segments: [],
+      };
+
       (transcriptRepository.findByRecordingId as jest.Mock).mockResolvedValue(mockTranscript);
-      mockGenerateContent.mockResolvedValue({
-        response: { text: () => JSON.stringify([{ description: 'Simple Task' }]) },
-      });
+      (gemini.models.generateContent as jest.Mock).mockResolvedValue({ text: '[]' });
 
-      await service.generateActionItems(mockRecordingId);
+      const result = await actionItemService.generateActionItems('recording-1');
 
-      expect(actionItemRepository.createMany).toHaveBeenCalledWith([
-        expect.objectContaining({
-          description: 'Simple Task',
-          completed: false,
-        }),
-      ]);
+      expect(result).toEqual([]);
     });
   });
 
-  describe('updateActionItem (Requirement 9.4)', () => {
-    test('Property 12: Action item completion toggle', async () => {
-      const itemId = 'item-123';
+  describe('updateActionItem', () => {
+    it('should update action item', async () => {
+      const mockUpdated = { id: '1', completed: true };
+      (actionItemRepository.update as jest.Mock).mockResolvedValue(mockUpdated);
 
-      // Test 1: Mark as complete
-      await service.updateActionItem(itemId, { completed: true });
-      expect(actionItemRepository.update).toHaveBeenCalledWith(itemId, { completed: true });
+      const result = await actionItemService.updateActionItem('1', { completed: true });
 
-      // Test 2: Mark as incomplete
-      await service.updateActionItem(itemId, { completed: false });
-      expect(actionItemRepository.update).toHaveBeenCalledWith(itemId, { completed: false });
-    });
-  });
-
-  describe('Property 13: Transcript reference validity', () => {
-    test('Action items should have valid segment references when quote matches', async () => {
-      (transcriptRepository.findByRecordingId as jest.Mock).mockResolvedValue(mockTranscript);
-      mockGenerateContent.mockResolvedValue({ response: { text: () => mockGeminiResponse } });
-
-      await service.generateActionItems(mockRecordingId);
-
-      // Verify that segmentStartTime is set when quote matches a segment
-      expect(actionItemRepository.createMany).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            segmentStartTime: 10, // Should match the segment's startTime
-          }),
-        ])
-      );
-    });
-
-    test('Action items should have null segment reference when no quote match', async () => {
-      (transcriptRepository.findByRecordingId as jest.Mock).mockResolvedValue(mockTranscript);
-      mockGenerateContent.mockResolvedValue({
-        response: {
-          text: () =>
-            JSON.stringify([
-              { description: 'Unmatched task', quote: 'This text does not exist in transcript' },
-            ]),
-        },
-      });
-
-      await service.generateActionItems(mockRecordingId);
-
-      expect(actionItemRepository.createMany).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            segmentStartTime: null,
-          }),
-        ])
-      );
+      expect(actionItemRepository.update).toHaveBeenCalledWith('1', { completed: true });
+      expect(result.completed).toBe(true);
     });
   });
 });

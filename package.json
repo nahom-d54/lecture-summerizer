@@ -9,8 +9,10 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
+    "dev:all": "concurrently \"npm run dev:transcription\" \"npm run dev -w backend\" \"npm run dev -w frontend\"",
     "dev:backend": "npm run dev -w backend",
     "dev:frontend": "npm run dev -w frontend",
+    "dev:transcription": "cd transcription-service && source venv/bin/activate && python main.py",
     "build": "npm run build --workspaces",
     "build:backend": "npm run build -w backend",
     "build:frontend": "npm run build -w frontend",
@@ -20,7 +22,8 @@
     "format:check": "biome format .",
     "test": "npm run test --workspaces",
     "clean": "npm run clean --workspaces && rm -rf node_modules",
-    "prepare": "husky"
+    "prepare": "husky",
+    "setup:transcription": "cd transcription-service && ./setup.sh"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,json,css,md}": [
