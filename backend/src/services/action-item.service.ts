@@ -1,5 +1,5 @@
-import { gemini } from '@/config/gemini';
 import { logger } from '@/config/logger';
+import { MODEL_NAME, openai } from '@/config/openai';
 import { actionItemRepository } from '@/repositories/action-item.repository';
 
 import { transcriptRepository } from '@/repositories/transcript.repository';
@@ -10,8 +10,6 @@ interface ExtractedItem {
   deadline: string | null;
   quote: string;
 }
-
-const MODEL_NAME = 'gemini-2.0-flash';
 
 export class ActionItemService {
   // 9.1 Generate and store action items from transcript
@@ -43,12 +41,26 @@ export class ActionItemService {
         Example: [{"description": "Send email", "assignee": "John", "deadline": "2023-10-20", "quote": "John needs to email"}]
       `;
 
-      // 3. Call Gemini with new SDK
-      const response = await gemini.models.generateContent({
+      // 3. Call OpenAI API (via GitHub Models)
+      logger.info(`Using model: ${MODEL_NAME}`);
+      const response = await openai.chat.completions.create({
         model: MODEL_NAME,
-        contents: prompt,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are an expert at extracting action items from meeting transcripts. Return only valid JSON arrays.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.5,
+        max_tokens: 1000,
       });
-      const responseText = response.text || '';
+
+      const responseText = response.choices[0]?.message?.content || '';
 
       // 4. Parse JSON
       const items: ExtractedItem[] = this.parseResponse(responseText);

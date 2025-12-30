@@ -5,8 +5,33 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
 
-// Load environment variables FIRST with absolute path
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+// Load environment variables FIRST
+// Try multiple paths to handle both tsx (dev) and compiled (prod) scenarios
+const envPaths = [
+  path.resolve(process.cwd(), '.env'), // When running from backend/
+  path.resolve(process.cwd(), 'backend/.env'), // When running from root
+  path.resolve(__dirname, '../.env'), // Relative to source
+  path.resolve(__dirname, '../../.env'), // Relative to dist
+];
+
+let envLoaded = false;
+for (const envPath of envPaths) {
+  const result = dotenv.config({ path: envPath });
+  if (!result.error) {
+    console.log(`[ENV] Loaded from: ${envPath}`);
+    envLoaded = true;
+    break;
+  }
+}
+
+if (!envLoaded) {
+  console.warn('[ENV] Warning: Could not load .env file from any expected location');
+}
+
+// Debug: Log key env vars (without sensitive values)
+console.log(`[ENV] DATABASE_URL: ${process.env.DATABASE_URL ? 'SET' : 'NOT SET'}`);
+console.log(`[ENV] GEMINI_API_KEY: ${process.env.GEMINI_API_KEY ? 'SET' : 'NOT SET'}`);
+console.log(`[ENV] JWT_SECRET: ${process.env.JWT_SECRET ? 'SET' : 'NOT SET'}`);
 
 import { logger } from '@/config/logger';
 import { errorHandler } from '@/middleware/errorHandler';

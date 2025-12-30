@@ -1,10 +1,8 @@
-import { gemini } from '@/config/gemini';
 import { logger } from '@/config/logger';
+import { MODEL_NAME, openai } from '@/config/openai';
 import { summaryRepository } from '@/repositories/summary.repository';
 import { transcriptRepository } from '@/repositories/transcript.repository';
 import { SummarizationOptions, SummaryResult } from '@/types/summarization.types';
-
-const MODEL_NAME = 'gemini-2.0-flash';
 
 export class SummarizationService {
   /**
@@ -33,13 +31,26 @@ export class SummarizationService {
       // 3. Build prompt
       const prompt = this.buildSummarizationPrompt(textToSummarize, options);
 
-      // 4. Call Gemini API with new SDK
-      const response = await gemini.models.generateContent({
+      // 4. Call OpenAI API (via GitHub Models)
+      logger.info(`Using model: ${MODEL_NAME}`);
+      const response = await openai.chat.completions.create({
         model: MODEL_NAME,
-        contents: prompt,
+        messages: [
+          {
+            role: 'system',
+            content:
+              'You are an expert lecture summarizer. Analyze transcripts and provide structured summaries in JSON format.',
+          },
+          {
+            role: 'user',
+            content: prompt,
+          },
+        ],
+        temperature: 0.7,
+        max_tokens: 2000,
       });
 
-      const responseText = response.text || '';
+      const responseText = response.choices[0]?.message?.content || '';
 
       // 5. Parse response
       const summaryResult = this.parseSummaryResponse(responseText);
@@ -54,7 +65,7 @@ export class SummarizationService {
 
       logger.info(`Summarization completed for recording: ${recordingId}`);
       return summaryResult;
-    } catch (error) {
+    } catch (error: any) {
       logger.error(`Error generating summary for recording ${recordingId}:`, error);
       throw error;
     }
