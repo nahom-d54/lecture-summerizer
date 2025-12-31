@@ -53,7 +53,7 @@ export class ExportService {
         doc.fontSize(12).text(data.summary.content);
         doc.moveDown();
 
-        const sections = (data.summary.sections as any[]) || [];
+        const sections = (data.summary.sections as unknown as SummarySection[]) || [];
         sections.forEach(section => {
           doc.fontSize(14).text(section.heading);
           doc.fontSize(12).text(section.content);
@@ -131,6 +131,7 @@ export class ExportService {
   async generateDOCX(recordingId: string): Promise<Buffer> {
     const data = await this.getExportData(recordingId);
 
+    // biome-ignore lint/suspicious/noExplicitAny: DOCX children have complex union types
     const children: any[] = [
       new Paragraph({
         text: data.title,

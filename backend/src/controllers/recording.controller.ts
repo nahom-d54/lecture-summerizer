@@ -79,6 +79,7 @@ export const recordingController = {
 
       const { search, status } = req.query;
 
+      // biome-ignore lint/suspicious/noExplicitAny: Dynamic where clause construction
       const whereClause: any = { userId };
 
       if (status) {
@@ -182,6 +183,7 @@ export const recordingController = {
         return res.status(404).json({ success: false, error: 'Recording not found' });
       }
 
+      // biome-ignore lint/suspicious/noExplicitAny: Dynamic update data construction
       const updateData: any = {};
       if (title) updateData.title = title;
 

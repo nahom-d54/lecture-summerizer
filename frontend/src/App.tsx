@@ -2,6 +2,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Navigate, Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import DashboardPage from '@/pages/Dashboard';
+import { LandingPage } from '@/pages/LandingPage';
 import LoginPage from '@/pages/Login';
 import RecordingPage from '@/pages/Recording';
 import RegisterPage from '@/pages/Register';
@@ -22,6 +23,7 @@ function AppRoutes() {
 
   return (
     <Routes>
+      <Route path="/" element={<LandingPage />} />
       <Route
         path="/login"
         element={isAuthenticated ? <Navigate to="/dashboard" /> : <LoginPage />}
@@ -54,7 +56,6 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
-      <Route path="/" element={<Navigate to={isAuthenticated ? '/dashboard' : '/login'} />} />
     </Routes>
   );
 }

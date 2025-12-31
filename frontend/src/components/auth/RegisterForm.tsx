@@ -53,6 +53,7 @@ export function RegisterForm() {
       const { data } = response.data; // Backend returns { success: true, data: { userId, email, token } }
       setAuth({ id: data.userId, email: data.email }, data.token);
       navigate('/dashboard');
+      // biome-ignore lint/suspicious/noExplicitAny: Error handling
     } catch (err: any) {
       setError(err.response?.data?.error || 'Registration failed');
     } finally {
@@ -91,6 +92,7 @@ export function RegisterForm() {
             />
             <div className="space-y-1 mt-2">
               {passwordRequirements.map((req, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: Password requirements are stable
                 <div key={i} className="flex items-center gap-2 text-xs">
                   {req.test(password) ? (
                     <Check className="h-3 w-3 text-green-600" />

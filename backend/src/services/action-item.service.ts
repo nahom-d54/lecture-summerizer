@@ -71,6 +71,7 @@ export class ActionItemService {
       }
 
       // 5. Map to Timestamps & Prepare DB Object
+      // biome-ignore lint/suspicious/noExplicitAny: Casting Prisma JSON to any array
       const segments = (transcript.segments as any[]) || [];
 
       const dbData = items.map(item => {

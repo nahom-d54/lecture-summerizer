@@ -34,15 +34,7 @@ export function ProcessingStatus({ recordingId, onComplete }: Props) {
 
           return (
             <div key={stage.key} className="flex items-center gap-3 text-sm">
-              {isComplete ? (
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              ) : isCurrent ? (
-                <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />
-              ) : isFailed && isCurrent ? (
-                <XCircle className="h-4 w-4 text-red-600" />
-              ) : (
-                <div className="h-4 w-4 rounded-full border-2 border-gray-300" />
-              )}
+              <StageIcon isComplete={isComplete} isCurrent={isCurrent} isFailed={isFailed} />
               <span
                 className={
                   isComplete
@@ -66,4 +58,21 @@ export function ProcessingStatus({ recordingId, onComplete }: Props) {
       )}
     </div>
   );
+}
+
+function StageIcon({
+  isComplete,
+  isCurrent,
+  isFailed,
+}: {
+  isComplete: boolean;
+  isCurrent: boolean;
+  isFailed: boolean;
+}) {
+  if (isComplete) return <CheckCircle className="h-4 w-4 text-green-600" />;
+  if (isCurrent) {
+    if (isFailed) return <XCircle className="h-4 w-4 text-red-600" />;
+    return <Loader2 className="h-4 w-4 text-blue-600 animate-spin" />;
+  }
+  return <div className="h-4 w-4 rounded-full border-2 border-gray-300" />;
 }

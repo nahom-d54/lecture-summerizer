@@ -32,6 +32,7 @@ export function LoginForm() {
       const { data } = response.data; // Backend returns { success: true, data: { userId, email, token } }
       setAuth({ id: data.userId, email: data.email }, data.token);
       navigate('/dashboard');
+      // biome-ignore lint/suspicious/noExplicitAny: error handling
     } catch (err: any) {
       setError(err.response?.data?.error || 'Login failed');
     } finally {

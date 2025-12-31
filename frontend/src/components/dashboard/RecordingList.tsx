@@ -44,6 +44,7 @@ export function RecordingList({ search, status }: Props) {
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {/* biome-ignore lint/suspicious/noExplicitAny: Recording type definition pending */}
       {recordings.map((recording: any) => (
         <RecordingCard key={recording.id} recording={recording} />
       ))}

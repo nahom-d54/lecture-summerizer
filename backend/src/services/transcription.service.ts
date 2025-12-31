@@ -51,7 +51,7 @@ export class TranscriptionService {
         },
         body: JSON.stringify({
           audio_path: filePath,
-          enable_diarization: options.enableSpeakerDiarization || false,
+          enable_diarization: options.enableSpeakerDiarization ?? true,
           language: options.language || null,
         }),
       });

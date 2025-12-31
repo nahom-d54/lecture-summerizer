@@ -66,6 +66,7 @@ export class SummarizationService {
       logger.info(`Summarization completed for recording: ${recordingId}`);
       return summaryResult;
     } catch (error: any) {
+      // biome-ignore lint/suspicious/noExplicitAny: Error handling
       logger.error(`Error generating summary for recording ${recordingId}:`, error);
       throw error;
     }

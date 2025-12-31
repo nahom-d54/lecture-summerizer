@@ -52,7 +52,7 @@ def get_diarization_pipeline():
         logger.info("Loading pyannote diarization pipeline...")
         _diarization_pipeline = Pipeline.from_pretrained(
             "pyannote/speaker-diarization-3.1",
-            use_auth_token=config.HF_TOKEN
+            token=config.HF_TOKEN
         )
         # Move to CPU explicitly
         _diarization_pipeline.to(torch.device(config.DEVICE))
@@ -127,7 +127,17 @@ def transcribe_audio(
         }
     
     # Check if diarization is available
-    pipeline = get_diarization_pipeline()
+    try:
+        pipeline = get_diarization_pipeline()
+    except Exception as e:
+        logger.error(f"Failed to load diarization pipeline: {e}")
+        return {
+            "language": detected_language,
+            "duration": round(duration, 2),
+            "text": full_text,
+            "diarization_error": f"Failed to load pipeline: {str(e)}"
+        }
+
     if pipeline is None:
         logger.warning("Diarization requested but pyannote not installed. Returning plain transcript.")
         return {
@@ -148,11 +158,25 @@ def transcribe_audio(
         }
     except Exception as e:
         logger.error(f"Diarization failed, returning plain transcript: {e}")
+        
+        # Helper to create simple segments
+        simple_segments = []
+        for seg in segments:
+            seg_text = seg.get("text", "").strip()
+            if seg_text:
+                simple_segments.append({
+                    "speaker": None,
+                    "start": round(seg["start"], 2),
+                    "end": round(seg["end"], 2),
+                    "text": seg_text
+                })
+
         # Fallback to plain transcript if diarization fails
         return {
             "language": detected_language,
             "duration": round(duration, 2),
             "text": full_text,
+            "segments": simple_segments,
             "diarization_error": str(e)
         }
 

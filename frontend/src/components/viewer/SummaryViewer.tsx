@@ -36,6 +36,7 @@ export function SummaryViewer({ content, sections = [], keyPoints = [] }: Props)
             <h4 className="font-medium text-sm text-gray-900 mb-2">Key Points</h4>
             <ul className="list-disc list-inside space-y-1">
               {keyPoints.map((point, i) => (
+                // biome-ignore lint/suspicious/noArrayIndexKey: Key points are stable
                 <li key={i} className="text-sm text-gray-600">
                   {point}
                 </li>
@@ -45,12 +46,14 @@ export function SummaryViewer({ content, sections = [], keyPoints = [] }: Props)
         )}
 
         {sections.map((section, index) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: Sections are stable
           <div key={index}>
             <h4 className="font-medium text-gray-900 mb-2">{section.heading}</h4>
             <p className="text-sm text-gray-600 mb-2">{section.content}</p>
             {section.bulletPoints && section.bulletPoints.length > 0 && (
               <ul className="list-disc list-inside space-y-1 ml-2">
                 {section.bulletPoints.map((point, i) => (
+                  // biome-ignore lint/suspicious/noArrayIndexKey: List items are stable
                   <li key={i} className="text-sm text-gray-500">
                     {point}
                   </li>

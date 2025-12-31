@@ -8,6 +8,7 @@ export const prisma = new Proxy({} as PrismaClient, {
     if (!_prisma) {
       _prisma = new PrismaClient();
     }
+    // biome-ignore lint/suspicious/noExplicitAny: Lazy proxy implementation requires dynamic property access
     return (_prisma as any)[prop];
   },
 });

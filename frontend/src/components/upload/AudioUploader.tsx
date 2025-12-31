@@ -26,6 +26,7 @@ export function AudioUploader() {
         navigate(`/recordings/${recordingId}`);
       }
     },
+    // biome-ignore lint/suspicious/noExplicitAny: Error handling
     onError: (err: any) => {
       setError(err.response?.data?.error || 'Upload failed');
     },
@@ -85,6 +86,8 @@ export function AudioUploader() {
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
               dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
             }`}
+            role="button"
+            tabIndex={0}
             onDragOver={e => {
               e.preventDefault();
               setDragActive(true);

@@ -50,7 +50,7 @@ This application uses a microservices architecture with clear separation of conc
   - Handles long audio files (up to 2 hours)
 
 ### 4. Google Gemini API
-- **Purpose**: AI-powered text analysis (NOT transcription)
+- **Purpose**: AI-powered text analysis
 - **Used for**:
   - Summarization
   - Key points extraction
