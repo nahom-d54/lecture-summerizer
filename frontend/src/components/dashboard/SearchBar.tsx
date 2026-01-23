@@ -1,6 +1,5 @@
 import { Search, X } from 'lucide-react';
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
 interface Props {
@@ -22,28 +21,25 @@ export function SearchBar({ value, onChange }: Props) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2">
-      <div className="relative flex-1">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+    <form onSubmit={handleSubmit} className="relative group">
+      <div className="relative flex items-center">
+        <Search className="absolute left-4 h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
         <Input
-          placeholder="Search recordings..."
+          placeholder="Search your recordings..."
           value={input}
           onChange={e => setInput(e.target.value)}
-          className="pl-9 pr-9"
+          className="pl-12 pr-12 h-12 bg-white border-slate-200 shadow-sm focus:ring-2 focus:ring-blue-100 focus:border-blue-500 transition-all text-base rounded-xl"
         />
         {input && (
           <button
             type="button"
             onClick={handleClear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            className="absolute right-4 p-1 rounded-full hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors"
           >
             <X className="h-4 w-4" />
           </button>
         )}
       </div>
-      <Button type="submit" variant="secondary">
-        Search
-      </Button>
     </form>
   );
 }

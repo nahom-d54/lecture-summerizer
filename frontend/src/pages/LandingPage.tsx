@@ -24,7 +24,6 @@ import {
   Menu,
   MessageSquare,
   Mic,
-  Play,
   Search,
   Shield,
   Sparkles,
@@ -51,21 +50,6 @@ export function LandingPage() {
   const { scrollYProgress } = useScroll();
 
   const parallaxY = useTransform(scrollYProgress, [0, 1], [0, -100]);
-
-  const fadeInUpVariants = {
-    hidden: { opacity: 0, y: 60 },
-    visible: { opacity: 1, y: 0 },
-  };
-
-  const staggerContainerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-      },
-    },
-  };
 
   const floatingAnimation = {
     y: [0, -20, 0],
@@ -146,20 +130,6 @@ export function LandingPage() {
               >
                 How It Works
               </motion.a>
-              <motion.a
-                whileHover={{ scale: 1.05 }}
-                href="#pricing"
-                className="text-slate-600 hover:text-blue-600 transition-colors"
-              >
-                Pricing
-              </motion.a>
-              <motion.a
-                whileHover={{ scale: 1.05 }}
-                href="#testimonials"
-                className="text-slate-600 hover:text-blue-600 transition-colors"
-              >
-                Testimonials
-              </motion.a>
             </div>
 
             <motion.div
@@ -215,12 +185,6 @@ export function LandingPage() {
                 </a>
                 <a href="#how-it-works" className="block text-slate-600 hover:text-blue-600">
                   How It Works
-                </a>
-                <a href="#pricing" className="block text-slate-600 hover:text-blue-600">
-                  Pricing
-                </a>
-                <a href="#testimonials" className="block text-slate-600 hover:text-blue-600">
-                  Testimonials
                 </a>
                 <div className="pt-4 border-t border-slate-200 space-y-2">
                   <Link to="/login" className="block">
@@ -318,7 +282,7 @@ export function LandingPage() {
                     size="lg"
                     className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-lg px-10 py-7 rounded-xl shadow-xl"
                   >
-                    Start Free Trial
+                    Start
                     <motion.div
                       animate={{ x: [0, 5, 0] }}
                       transition={{ duration: 1.5, repeat: Infinity }}
@@ -328,38 +292,10 @@ export function LandingPage() {
                   </Button>
                 </motion.div>
               </Link>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="text-lg px-10 py-7 rounded-xl border-2 border-slate-300"
-                >
-                  <Play className="mr-2 w-5 h-5" />
-                  Watch Demo
-                </Button>
-              </motion.div>
             </motion.div>
 
             {/* Trust Indicators */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="flex flex-wrap items-center justify-center gap-8 text-sm text-slate-600 mb-16"
-            >
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span>No credit card required</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span>Free 14-day trial</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-500" />
-                <span>Cancel anytime</span>
-              </div>
-            </motion.div>
+            {/* Trust Indicators Removed */}
           </div>
 
           {/* Hero Interactive Demo */}
@@ -716,7 +652,7 @@ export function LandingPage() {
                   icon: Brain,
                   title: 'AI Processing Magic',
                   description:
-                    'Our advanced AI models transcribe, identify speakers, detect topics, and extract key information. Usually completes in under 5 minutes for a 1-hour lecture.',
+                    'Our advanced AI models transcribe, identify speakers, detect topics, and extract key information. Usually completes in under 5 minutes for a 1-hour recording.',
                   features: [
                     'Speaker detection',
                     'Topic analysis',

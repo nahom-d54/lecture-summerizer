@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ArrowLeft, Calendar, Clock, FileAudio, Loader2, Mic } from 'lucide-react';
-import { Link, useParams } from 'react-router-dom';
+import { ArrowLeft, Calendar, Clock, FileAudio, Loader2, Mic, Trash2 } from 'lucide-react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProcessingStatus } from '@/components/upload/ProcessingStatus';
@@ -13,12 +13,31 @@ import { recordingsApi } from '@/lib/api';
 
 export default function RecordingPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const { data, isLoading, refetch } = useQuery({
     queryKey: ['recording', id],
     queryFn: () => recordingsApi.get(id as string),
     enabled: !!id,
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: recordingsApi.delete,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['recordings'] });
+      navigate('/dashboard');
+    },
+    onError: () => {
+      alert('Failed to delete recording');
+    },
+  });
+
+  const handleDelete = () => {
+    if (confirm('Are you sure you want to delete this recording? This action cannot be undone.')) {
+      deleteMutation.mutate(id as string);
+    }
+  };
 
   const recording = data?.data?.data;
   const isProcessing = recording && !['completed', 'failed'].includes(recording.status);
@@ -73,12 +92,23 @@ export default function RecordingPage() {
       {/* Header */}
       <header className="bg-white/80 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <Link to="/dashboard">
-            <Button variant="ghost" size="sm" className="hover:bg-slate-100">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Dashboard
+          <div className="flex items-center justify-between">
+            <Link to="/dashboard">
+              <Button variant="ghost" size="sm" className="hover:bg-slate-100">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Dashboard
+              </Button>
+            </Link>
+            <Button
+              variant="outline"
+              size="sm"
+              className="text-red-500 hover:text-red-700 hover:bg-red-50 border-red-200"
+              onClick={handleDelete}
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Delete Recording
             </Button>
-          </Link>
+          </div>
         </div>
       </header>
 

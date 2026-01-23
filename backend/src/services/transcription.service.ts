@@ -13,6 +13,7 @@ import {
   TranscriptionResult,
   TranscriptSegment,
 } from '@/types/transcription.types';
+import { aiDiarizationService } from './ai-diarization.service';
 
 // Python transcription service URL
 const TRANSCRIPTION_SERVICE_URL = process.env.TRANSCRIPTION_SERVICE_URL || 'http://localhost:8000';
@@ -43,7 +44,7 @@ export class TranscriptionService {
     try {
       logger.info(`Starting transcription for file: ${filePath}`);
 
-      // Call Python transcription service
+      // Call Python transcription service (without diarization to avoid pyannote issues)
       const response = await fetch(`${TRANSCRIPTION_SERVICE_URL}/transcribe-path`, {
         method: 'POST',
         headers: {
@@ -51,7 +52,7 @@ export class TranscriptionService {
         },
         body: JSON.stringify({
           audio_path: filePath,
-          enable_diarization: options.enableSpeakerDiarization ?? true,
+          enable_diarization: false, // Disable pyannote, use AI instead
           language: options.language || null,
         }),
       });
@@ -67,7 +68,12 @@ export class TranscriptionService {
       }
 
       // Convert Python service response to our internal format
-      const transcriptionResult = this.convertWhisperResponse(result);
+      let transcriptionResult = this.convertWhisperResponse(result);
+
+      // Apply AI-based speaker diarization if enabled
+      if (options.enableSpeakerDiarization ?? true) {
+        transcriptionResult = await this.applyAIDiarization(transcriptionResult);
+      }
 
       logger.info(`Transcription completed for file: ${filePath}`);
       return transcriptionResult;
@@ -156,6 +162,32 @@ export class TranscriptionService {
       speakers,
       duration,
     };
+  }
+
+  /**
+   * Apply AI-based speaker diarization to transcription result
+   */
+  private async applyAIDiarization(result: TranscriptionResult): Promise<TranscriptionResult> {
+    try {
+      logger.info('Applying AI-based speaker diarization...');
+
+      // Use AI to identify speakers
+      const diarizedSegments = await aiDiarizationService.diarizeTranscript(result.segments);
+
+      // Extract unique speakers
+      const speakers = Array.from(new Set(diarizedSegments.map(s => s.speaker)));
+
+      logger.info(`AI diarization applied: ${speakers.length} speakers identified`);
+
+      return {
+        ...result,
+        segments: diarizedSegments,
+        speakers,
+      };
+    } catch (error) {
+      logger.error('AI diarization failed, returning original result:', error);
+      return result;
+    }
   }
 
   /**

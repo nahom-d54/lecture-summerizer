@@ -1,4 +1,4 @@
-import { Calendar, Clock, FileAudio } from 'lucide-react';
+import { FileAudio } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,13 +25,6 @@ const statusVariants: Record<
   uploading: 'secondary',
 };
 
-function formatDuration(seconds?: number): string {
-  if (!seconds) return '--:--';
-  const mins = Math.floor(seconds / 60);
-  const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
-}
-
 function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString('en-US', {
     month: 'short',
@@ -40,35 +33,64 @@ function formatDate(dateStr: string): string {
   });
 }
 
-export function RecordingCard({ recording }: { recording: Recording }) {
+import { Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+
+export function RecordingCard({
+  recording,
+  onDelete,
+}: {
+  recording: Recording;
+  onDelete: (id: string) => void;
+}) {
   return (
-    <Link to={`/recordings/${recording.id}`}>
-      <Card className="hover:shadow-md transition-shadow cursor-pointer">
-        <CardHeader className="pb-2">
-          <div className="flex items-start justify-between">
-            <CardTitle className="text-base font-medium truncate pr-2">{recording.title}</CardTitle>
-            <Badge variant={statusVariants[recording.status] || 'secondary'}>
-              {recording.status.replace(/_/g, ' ')}
-            </Badge>
+    <Card className="group hover:shadow-lg transition-all duration-200 border-slate-200 bg-white overflow-hidden relative">
+      <div className="absolute top-0 left-0 w-1 h-full bg-transparent group-hover:bg-blue-500 transition-colors" />
+
+      <Link to={`/recordings/${recording.id}`} className="block">
+        <CardHeader className="pb-3 pt-5 px-5">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-base font-semibold text-slate-900 truncate leading-tight group-hover:text-blue-600 transition-colors">
+                {recording.title || 'Untitled Recording'}
+              </CardTitle>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge
+                variant={statusVariants[recording.status] || 'secondary'}
+                className="shrink-0 capitalize font-medium"
+              >
+                {recording.status.replace(/_/g, ' ')}
+              </Badge>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 text-slate-400 hover:text-red-600 hover:bg-red-50 -mr-2"
+                onClick={e => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  onDelete(recording.id);
+                }}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="flex items-center gap-4 text-sm text-gray-500">
-            <div className="flex items-center gap-1">
-              <FileAudio className="h-4 w-4" />
-              <span>{recording.format.split('/')[1]?.toUpperCase() || 'Audio'}</span>
+
+        <CardContent className="px-5 pb-5">
+          <div className="flex items-center gap-4 text-xs font-medium text-slate-500">
+            <div className="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-md border border-slate-100">
+              <FileAudio className="h-3.5 w-3.5 text-slate-400" />
+              <span>{recording.format.split('/')[1]?.toUpperCase() || 'AUDIO'}</span>
             </div>
-            <div className="flex items-center gap-1">
-              <Clock className="h-4 w-4" />
-              <span>{formatDuration(recording.duration)}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Calendar className="h-4 w-4" />
-              <span>{formatDate(recording.createdAt)}</span>
+            {/* Duration removed as per user request */}
+            <div className="flex items-center gap-1.5 ml-auto">
+              <span className="text-slate-400">{formatDate(recording.createdAt)}</span>
             </div>
           </div>
         </CardContent>
-      </Card>
-    </Link>
+      </Link>
+    </Card>
   );
 }
