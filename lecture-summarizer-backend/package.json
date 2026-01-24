@@ -1,0 +1,40 @@
+{
+  "name": "lecture-summarizer-backend",
+  "version": "1.0.0",
+  "description": "Backend service for summarizing lecture transcripts.",
+  "main": "src/server.ts",
+  "scripts": {
+    "start": "ts-node src/server.ts",
+    "dev": "ts-node-dev src/server.ts",
+    "build": "tsc",
+    "migrate": "prisma migrate deploy",
+    "seed": "ts-node prisma/seed.ts",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@prisma/client": "^3.0.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.2",
+    "ts-node": "^10.0.0",
+    "ts-node-dev": "^1.1.8",
+    "jest": "^27.0.0",
+    "@types/jest": "^27.0.0",
+    "@types/node": "^16.0.0",
+    "eslint": "^7.27.0",
+    "@typescript-eslint/parser": "^4.28.0",
+    "@typescript-eslint/eslint-plugin": "^4.28.0"
+  },
+  "keywords": [
+    "transcripts",
+    "lecture",
+    "summarization",
+    "backend"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}

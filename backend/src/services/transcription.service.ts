@@ -17,6 +17,9 @@ import { aiDiarizationService } from './ai-diarization.service';
 
 // Python transcription service URL
 const TRANSCRIPTION_SERVICE_URL = process.env.TRANSCRIPTION_SERVICE_URL || 'http://localhost:8000';
+// Optional: use pyannote diarization directly from Python service (requires HF token)
+const USE_PYANNOTE_DIARIZATION =
+  (process.env.USE_PYANNOTE_DIARIZATION || 'false').toLowerCase() === 'true';
 
 // Response from Python transcription service
 interface WhisperResponse {
@@ -44,7 +47,7 @@ export class TranscriptionService {
     try {
       logger.info(`Starting transcription for file: ${filePath}`);
 
-      // Call Python transcription service (without diarization to avoid pyannote issues)
+      // Call Python transcription service
       const response = await fetch(`${TRANSCRIPTION_SERVICE_URL}/transcribe-path`, {
         method: 'POST',
         headers: {
@@ -52,7 +55,7 @@ export class TranscriptionService {
         },
         body: JSON.stringify({
           audio_path: filePath,
-          enable_diarization: false, // Disable pyannote, use AI instead
+          enable_diarization: USE_PYANNOTE_DIARIZATION, // true -> pyannote, false -> AI diarization
           language: options.language || null,
         }),
       });

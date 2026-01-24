@@ -46,14 +46,20 @@ const speakerColors = [
 ];
 
 export function TranscriptViewer({ segments, speakers = [] }: Props) {
-  // Debug: log the data
-  console.log('Transcript segments:', segments);
-  console.log('Speakers:', speakers);
+  // Check if we have speaker information
+  const hasSpeakers = segments.some(seg => seg.speaker);
 
+  // Extract unique speakers from segments if not provided
+  const actualSpeakers =
+    speakers.length > 0
+      ? speakers
+      : (Array.from(new Set(segments.map(s => s.speaker).filter(Boolean))) as string[]);
+
+  // Map a given speaker label to a stable color, even if speakers prop is empty
   const getSpeakerColor = (speaker?: string) => {
     if (!speaker) return speakerColors[0];
-    const index = speakers.indexOf(speaker);
-    return speakerColors[index % speakerColors.length];
+    const index = actualSpeakers.indexOf(speaker);
+    return speakerColors[(index >= 0 ? index : 0) % speakerColors.length];
   };
 
   if (!segments || segments.length === 0) {
@@ -68,15 +74,6 @@ export function TranscriptViewer({ segments, speakers = [] }: Props) {
       </Card>
     );
   }
-
-  // Check if we have speaker information
-  const hasSpeakers = segments.some(seg => seg.speaker);
-
-  // Extract unique speakers from segments if not provided
-  const actualSpeakers =
-    speakers.length > 0
-      ? speakers
-      : (Array.from(new Set(segments.map(s => s.speaker).filter(Boolean))) as string[]);
 
   return (
     <div className="space-y-4">
